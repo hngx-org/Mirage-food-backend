@@ -25,7 +25,7 @@ app.get("/api", (req, res) => {
   res.status(200).send({
     slack_name,
     current_day,
-    utc_time,
+    utc_time: JSON.parse(JSON.stringify(utc_time)).split(".")[0] + "Z",
     track,
     github_file_url:
       "https://github.com/simondevz/HNG-Internship/blob/main/stage-one/app.js",
