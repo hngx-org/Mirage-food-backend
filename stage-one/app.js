@@ -15,12 +15,10 @@ app.get("/api", (req, res) => {
   ];
 
   if (!slack_name || !track) {
-    res
-      .status(400)
-      .send({
-        message:
-          "You must have a slack_name and track in your query params to use this endpoint",
-      });
+    res.status(400).send({
+      message:
+        "You must have a slack_name and track in your query params to use this endpoint",
+    });
   }
 
   const current_day = weekday[utc_time.getUTCDay()];
@@ -29,8 +27,9 @@ app.get("/api", (req, res) => {
     current_day,
     utc_time,
     track,
-    github_file_url: "https://github.com/username/repo/blob/main/file_name.ext",
-    github_repo_url: "https://github.com/username/repo",
+    github_file_url:
+      "https://github.com/simondevz/HNG-Internship/blob/main/stage-one/app.js",
+    github_repo_url: "https://github.com/simondevz/HNG-Internship/tree/main",
     status_code: 200,
   });
 });
