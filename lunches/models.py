@@ -1,14 +1,34 @@
 from django.db import models
-from users.models import User
+from django.conf import settings
 
-class Lunches(models.Model):
-    sender = models.ForeignKey('Users', on_delete=models.CASCADE)
-    receiver = models.ForeignKey('Users', on_delete=models.CASCADE)
-    quantity = models.IntegerField()
+
+class Lunch(models.Model):
+    quantity = models.PositiveIntegerField(default=1)
     redeemed = models.BooleanField(default=False)
+    note = models.CharField(max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    note = models.CharField(max_length=128)
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="sent_lunches",
+        on_delete=models.CASCADE,
+        db_index=True,
+    )
+    receiver = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="received_lunches",
+        on_delete=models.CASCADE,
+        db_index=True,
+    )
 
+    """
+        The related name can be used to query the database
+        efficiently... eg
+        To get all the lunches sent by the user - user.sent_lunches.all()
+        To get all the lunches received by the user - user.received_lunches.all()
+    """
 
+    class Meta:
+        verbose_name_plural = "Lunches"
 
-# Create your models here.
+    def __str__(self) -> str:
+        return f"{self.sender} sent a lunch to {self.receiver}"
