@@ -5,6 +5,7 @@
 ## Prerequisites
 1. Ensure you have `python3` version >=3.8 installed. To find out about this, Open a command prompt or terminal and type `python3 -v`.
 2. You have a text editor (preferably VScode) installed on your computer
+3. You have mysql set up as it is what we will be using
 
 ## Contributing Rules
 1. Clone repository
