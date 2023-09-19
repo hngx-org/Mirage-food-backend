@@ -5,7 +5,7 @@ from django.conf import settings
 class Lunch(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     redeemed = models.BooleanField(default=False)
-    note = models.CharField(max_length=200, blank=True, null=True)
+    note = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
