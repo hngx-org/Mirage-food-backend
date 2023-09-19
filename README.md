@@ -76,7 +76,7 @@ Ensure to follow these steps when committing:
 ## Opening a Pull request
 
 1. Go to github
-2. Open a new Pull Request to the Development.
+2. Open a new Pull Request to the Development Branch and not the Main Branch.
 
 ## Technology used 
 * [Python 3.10.12](https://www.python.org/)
