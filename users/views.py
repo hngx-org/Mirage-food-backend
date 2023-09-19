@@ -19,4 +19,7 @@ def get_user(request, pk, *args, **kwargs):
     else:
         user = get_object_or_404(User, email=pk)
     serializer = UserSerializer(user)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response({
+        "message": "User found",
+        "data": serializer.data
+    }, status=status.HTTP_200_OK)
