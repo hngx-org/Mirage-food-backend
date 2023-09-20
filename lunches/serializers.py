@@ -4,4 +4,4 @@ from .models import Lunch
 class LunchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lunch
-        fields = ['balance']
+        fields = '__all__'
