@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 #from .models import User
 #from .serializers import UserSerializer
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, authentication
 
 @csrf_exempt
 @api_view(['GET'])
