@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
 from . views import CreateFreeLunchAPIView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+)
 urlpatterns = [
-    path('send_free_lunch',CreateFreeLunchAPIView.as_view(), name="free_lunch"),
+    path('api/lunch/send',CreateFreeLunchAPIView.as_view(), name="free_lunch"),
+    
+    
 
 ]
