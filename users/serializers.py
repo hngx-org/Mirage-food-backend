@@ -1,4 +1,5 @@
 from .models import User
+from .models import User
 from rest_framework import serializers
 from django.core import validators
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator

@@ -1,8 +1,4 @@
-from django.shortcuts import render
-
-# Create your views here.
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -11,12 +7,21 @@ from .models import User
 from .serializers import UserListSerializer
 
 class UserListViewSet(APIView):
-    def get(self, request, *args, **kwargs):
+    def get_object(self, pk):
         """
-        Get user details
+        Gets a user object with the given pk
         """
-        queryset = User.objects.all()
-        serializer = UserListSerializer(queryset, many=True)
+        try:
+            return User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return None
+
+    def get(self, request, pk, format=None):
+        """
+        Gets user details
+        """
+        user = User.objects.all()
+        serializer = UserListSerializer(user, many=True)
 
         return Response({
             "message" : "successfully fetched users",
