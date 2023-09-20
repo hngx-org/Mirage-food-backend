@@ -44,6 +44,9 @@ class User(PermissionsMixin, AbstractBaseUser):
     updated_at = models.DateTimeField(_("updated date"), auto_now=True)
     lunch_credit_balance = models.CharField(_("lunch credit"), max_length=50)
 
+    groups = models.ManyToManyField('auth.Group',verbose_name='groups',blank=True,related_name='custom_users_groups')
+    user_permissions = models.ManyToManyField('auth.Permission',verbose_name='user permissions',blank=True,related_name='custom_users_permissions')
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name"]
     objects = UserManager()
