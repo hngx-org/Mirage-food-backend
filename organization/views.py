@@ -1,3 +1,17 @@
-from django.shortcuts import render
+from rest_framework import generics, viewsets
 
-# Create your views here.
+from .models import Organization
+from .serializers import OrganizationSerializer
+
+
+class OrganizationAPI(
+    generics.UpdateAPIView, generics.ListAPIView, viewsets.GenericViewSet
+):
+    """Base view for organization update (put | patch)"""  # can be modified when adding other methods
+
+    serializer_class = OrganizationSerializer
+
+    def get_queryset(self):
+        return Organization.objects.all()
+
+    ...
