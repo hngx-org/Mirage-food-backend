@@ -22,8 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = config('SECRET_KEY')
-SECRET_KEY = 'django-insecure-+fo)e4=+q8bg0ka32ova!nijs0cbodgsv5o9)41_!4wo$__3#3'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,8 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'rest_framework',
-    'lunches',
-    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -80,21 +77,14 @@ WSGI_APPLICATION = 'freelunch.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.mysql',
-#        'NAME': config('DB_NAME'),
-#        'USER': config('DB_USER'),
-#        'PASSWORD':config('DB_PASSWORD')
- #       }
-#}
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD':config('DB_PASSWORD')
+        }
 }
-
 
 #pagination
 REST_FRAMEWORK = {

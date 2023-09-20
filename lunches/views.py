@@ -1,3 +1,4 @@
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -32,3 +33,22 @@ class CreateFreeLunchAPIView(APIView):
                 return Response({'message': error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"message": "Lunch request created successfully", "data": data}, status=status.HTTP_201_CREATED)
+
+
+# Create your views here.
+class UpdateLunch(APIView):
+    def post(self, request):
+        # Get the authenticated user
+        user = request.user
+
+        # Get or create the lunch wallet for the user
+        lunch_wallet, created = Lunch.objects.get_or_create(user=user)
+
+        # Deserialize the data from the request
+        serializer = LunchSerializer(lunch_wallet, data=request.data)
+
+        if serializer.is_valid():
+            # Update the lunch wallet balance
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUES)
