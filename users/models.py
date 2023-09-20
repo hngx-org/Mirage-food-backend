@@ -31,7 +31,7 @@ class UserManager(BaseUserManager):
 class User(PermissionsMixin, AbstractBaseUser):
     # by default django uses auto increament for the id
     # uncomment org_id when organization model has been created
-    org_id = models.ForeignKey(Organization, verbose_name=_("organisation name"), on_delete=models.CASCADE, null=True)
+    org_id = models.ForeignKey(Organization, verbose_name=_("organization name"), on_delete=models.CASCADE, null=True)
     first_name = models.CharField(_("first name"), max_length=225)
     last_name = models.CharField(_("last name"), max_length=225, blank=True, null=True)
     profile_pic = CloudinaryField(_("profile pic"))
