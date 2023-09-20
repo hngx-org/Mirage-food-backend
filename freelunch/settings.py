@@ -80,9 +80,9 @@ WSGI_APPLICATION = 'freelunch.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD':config('DB_PASSWORD')
+        'NAME': 'free_lunch',
+        'USER': 'root',
+        'PASSWORD':'0layimika'
         }
 }
 
