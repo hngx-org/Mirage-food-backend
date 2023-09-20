@@ -1,5 +1,14 @@
 from rest_framework import serializers
+from models import OrganizationLunchWallet
 
+
+class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
+    """
+    Serializer for organization lunch model
+    """
+    class Meta:
+        model = OrganizationLunchWallet
+        fields = ['balance', 'orgnization']
 
 class OrganizationSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
