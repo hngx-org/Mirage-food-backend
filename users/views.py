@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import User
@@ -21,3 +22,26 @@ class DeleteUserView:
         user = self.get_user_by_pk(pk=id)
         user.delete()
         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
+=======
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import User
+
+from .serializers import UserListSerializer
+
+class UserListViewSet(APIView):
+    def get(self, request, *args, **kwargs):
+        """
+        Get user details
+        """
+        queryset = User.objects.all()
+        serializer = UserListSerializer(queryset, many=True)
+
+        return Response({
+            "message" : "successfully fetched users",
+            "statusCode": status.HTTP_200_OK,
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)
+>>>>>>> 1729f3a5f3e94012b6cbf58fde706afda62051b6
