@@ -1,11 +1,12 @@
 from django.db import models
 
-# Create your models here.
 
 class Organization(models.Model):
-    name = models.CharField(max_length=27, blank=False)
-    lunch_price = models.DecimalField(decimal_places=2)
-    currency = models.CharField(max_length=10, blank=False)
+    name = models.CharField(max_length=255, blank=False, null=False)
+    lunch_price = models.DecimalField(decimal_places=2, max_digits=10, null=False, default=0.00)
+    currency = models.CharField(max_length=3, blank=False, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -14,10 +15,3 @@ class Organization(models.Model):
         verbose_name_plural = 'Organizations'
 
 
-# A model to represent the wallet owned by an organization (according to the present schema)
-class Organization_Lunch_Wallet(models.Model):
-    org_id = models.OneToOneField(Organization, related_name='lunch_wallet', on_delete=models.CASCADE)
-    balance = models.DecimalField(decimal_places=2, default=0.00)
-
-    def __str__(self):
-        return self.org_id.__str__()
