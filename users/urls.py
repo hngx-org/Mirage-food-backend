@@ -1,6 +1,7 @@
-from django.urls import path
-from users import views
+from django.urls import path, re_path, include
+
+from .views import UserListViewSet
 
 urlpatterns = [
-    path('users/:id/organizations/:id/employees?employee=id', views.get_user, name='get_user'),
+    path('users/', UserListViewSet.as_view(), name='users-list'),
 ]

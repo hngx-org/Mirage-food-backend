@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-
+from users.models import User
 
 class Lunch(models.Model):
     quantity = models.PositiveIntegerField(default=1)
