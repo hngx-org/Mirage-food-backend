@@ -5,8 +5,6 @@ from rest_framework.response import Response
 from rest_framework import status
 
 # Create your views here.
-
-
 @api_view(['GET'])
 def get_a_lunch(request, id):
     """Returns an existing lunch by id"""
