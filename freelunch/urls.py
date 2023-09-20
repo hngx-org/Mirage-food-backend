@@ -18,12 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 
 
-api_route = [
-    path("organization", include("organization.urls", namespace="organization")),
-    # include others apps urls here!
+api_routes = [
+    path("organization/", include("organization.urls", namespace="organization")),
+    # you can include others apps urls here...
 ]
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include(api_route)),
+    path("api/", include(api_routes)),
 ]
