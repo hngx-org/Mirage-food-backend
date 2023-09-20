@@ -19,5 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin', admin.site.urls),
-    path('update-lunch-wallet', include("lunches.urls"))
+    path('api/users/<int:sender_id>/organizations/<int:organization_id>/lunches', include("lunches.urls")),
 ]

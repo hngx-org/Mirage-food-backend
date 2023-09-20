@@ -1,8 +1,7 @@
 from django.contrib import admin
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from lunches.views import UpdateLunch
+from django.urls import path
+from .views import SendFreeLunch
 
 urlpatterns = [
-    path('update-lunch-wallet', UpdateLunch.as_view(), name='update-lunch-wallet'),
+    path('api/users/<int:sender_id>/organizations/<int:organization_id>/lunches', SendFreeLunch.as_view(), name='send-free-lunch'),
 ]
