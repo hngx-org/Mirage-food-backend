@@ -18,4 +18,4 @@ class ListInvitesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrganizationInvites
-        fields = ["id", "org_id", "email", "token", "TTL"]
+        fields = '__all__'
