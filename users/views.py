@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404, get_list_or_404
-#from .models import User
+from .models import User
 #from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status, authentication
@@ -22,7 +22,6 @@ def get_user(request, pk, *args, **kwargs):
     except:
         user = get_object_or_404(User, email=pk)
         serializer = UserSerializer(user)
-    serializer = UserSerializer(user)
     return Response({
         "message": "User found",
         "data": serializer.data
