@@ -45,7 +45,7 @@ class User(PermissionsMixin, AbstractBaseUser):
     # launch_credit_balance = models.CharField(_("launch credit"), max_length=50)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name"]
+    REQUIRED_FIELDS = ["first_name"]
     objects = UserManager()
 
     class Meta:
