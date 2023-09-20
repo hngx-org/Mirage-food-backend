@@ -9,7 +9,7 @@ def get_organization(request, user_id, organization_id):
     try:
         # Check if the user exists
         user = User.objects.get(id=user_id)
-    except user.DoesNotExist:
+    except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
     try:
