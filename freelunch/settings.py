@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import os 
+import os
 from decouple import config
 import cloudinary
 import cloudinary.uploader
@@ -85,14 +85,16 @@ WSGI_APPLICATION = 'freelunch.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD':config('DB_PASSWORD')
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': config('DB_NAME'),
+        # 'USER': config('DB_USER'),
+        # 'PASSWORD':config('DB_PASSWORD')
+    }
 }
 
-#pagination
+# pagination
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
@@ -138,9 +140,9 @@ STATIC_URL = 'static/'
 
 # cloudinary config for profile picture upload
 cloudinary.config(
-    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
-    api_key = config('CLOUDINARY_API_KEY'),
-    api_secret = config('CLOUDINARY_API_SECRET')
+    cloud_name=config('CLOUDINARY_CLOUD_NAME'),
+    api_key=config('CLOUDINARY_API_KEY'),
+    api_secret=config('CLOUDINARY_API_SECRET')
 )
 
 
