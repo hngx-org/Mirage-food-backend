@@ -8,4 +8,4 @@ class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = OrganizationLunchWallet
-        fields = ['balance', 'orgnization']
+        fields = ['balance', 'organization']

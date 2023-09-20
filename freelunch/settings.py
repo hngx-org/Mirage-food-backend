@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'users',
     'withdrawals',
     'rest_framework',
+    'organization'
 ]
 
 MIDDLEWARE = [
