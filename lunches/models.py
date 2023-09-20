@@ -1,25 +1,24 @@
 
 from django.db import models
 from django.conf import settings
+from users.models import User
 
 class Lunch(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     redeemed = models.BooleanField(default=False)
     note = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    sender = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+    updated_at = models.DateTimeField(auto_now=True)
+    sender_id = models.ForeignKey(
+        User,
         related_name="sent_lunches",
         on_delete=models.CASCADE,
-        db_index=True,
     )
     receiver = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         related_name="received_lunches",
         on_delete=models.CASCADE,
-        db_index=True,
     )
-
     """
         The related name can be used to query the database
         efficiently... eg

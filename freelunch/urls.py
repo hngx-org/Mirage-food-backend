@@ -22,5 +22,8 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('admin', admin.site.urls),
-    path('update-lunch-wallet', include("lunches.urls"))
+    path('update-lunch-wallet', include("lunches.urls")),
+    path('api/', include('organization.urls')),
+    path('api/', include('users.urls')),
+    path('', include('lunches.urls')),
 ]
