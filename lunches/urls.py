@@ -6,5 +6,4 @@ from rest_framework_simplejwt.views import (
 )
 urlpatterns = [
     path('api/lunch/send',CreateFreeLunchAPIView.as_view(), name="free_lunch"),
-    path('update-lunch-wallet', UpdateLunch.as_view(), name='update-lunch-wallet'),
 ]
