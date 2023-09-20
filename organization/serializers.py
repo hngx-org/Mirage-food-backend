@@ -14,17 +14,6 @@ class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
-    lunch_price = serializers.DecimalField(max_digits=10, decimal_places=2)
-
     class Meta:
         model = Organization
         fields = ["name", "lunch_price", "currency"]
-
-    def validate_lunch_price(self, value):
-        if value:
-            if value < 0:
-                raise serializers.ValidationError("Lunch price cannot be negative")
-        else:
-            value = 1000
-
-        return value
