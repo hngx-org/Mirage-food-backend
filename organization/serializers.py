@@ -17,3 +17,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
         fields = ["name", "lunch_price", "currency"]
+
+#Serializer for Organization Invite
+class OrganizationInviteSerializer(serializers.Serializer):
+    email = serializers.EmailField()
