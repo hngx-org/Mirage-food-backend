@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404, get_list_or_404
 from .models import User
-#from .serializers import UserSerializer
+from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status, authentication
 from rest_framework.permissions import IsAuthenticated
