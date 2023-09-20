@@ -1,24 +1,22 @@
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Organization
 from users.models import User
 from .serializers import OrganizationSerializer
+from rest_framework.decorators import api_view
 
 
 # Create your views here.
 
 
-def get_organization(request, user_id, organization_id):
+@api_view(['GET'])
+def get_organization(request, user_id, org_id):
     try:
-        # Check if the user exists
-        user = User.objects.get(id=user_id)
+        user = User.objects.get(pk=user_id)
+        organization = user.org_id  # Retrieve the organization associated with the user
+        if organization and organization.id == org_id:
+            serializer = OrganizationSerializer(organization)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Organization not found for this user'}, status=status.HTTP_404_NOT_FOUND)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    try:
-        # Retrieve the organization based on user and organization IDs
-        organization = Organization.objects.get(id=organization_id, user_id=user_id)
-        serializer = OrganizationSerializer(organization)  # Serialize the organization
-        return Response(serializer.data)
-    except Organization.DoesNotExist:
-        return Response({'error': 'Organization not found'}, status=status.HTTP_404_NOT_FOUND)
