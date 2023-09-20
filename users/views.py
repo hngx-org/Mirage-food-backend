@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import status
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -22,24 +23,27 @@ class UserListViewSet(APIView):
             "statusCode": status.HTTP_200_OK,
             "data": serializer.data
         }, status=status.HTTP_200_OK)
-    
-    def put(selt,request, *args, **kwargs):
-        
-        '''
-        updating user details
-        '''
-        queryset = User.objects.all()
-        serializer_class = UserListSerializer()
+
+
+'''
+the PUT AND PATCH functionality
+'''
+
+class UpdateUserDetailsView(RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserListSerializer
+
+    def put(self, request, *args, **kwargs):
         user_id = kwargs.get('pk')
 
-    # checking if the user exist
-
+        # Checking if the user exists
         try:
-            User = User.objects.get(pk=user_id)
+            user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return Response({"status": False, "message": f"The user with user_id {user_id} does not exist."},
                             status=status.HTTP_404_NOT_FOUND)
-        serializer = serializer_class(User, data=request.data, partial=True)
+
+        serializer = self.get_serializer(user, data=request.data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
@@ -47,10 +51,3 @@ class UserListViewSet(APIView):
                             status=status.HTTP_200_OK)
         else:
             return Response({"status": False, "message": "Invalid data provided."}, status=status.HTTP_400_BAD_REQUEST)
-
-        
-
-
-
-
-
