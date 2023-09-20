@@ -10,21 +10,6 @@ from .models import User
 
 from .serializers import UserListSerializer
 
-class UserListViewSet(APIView):
-    def get(self, request, *args, **kwargs):
-        """
-        Get user details
-        """
-        queryset = User.objects.all()
-        serializer = UserListSerializer(queryset, many=True)
-
-        return Response({
-            "message" : "successfully fetched users",
-            "statusCode": status.HTTP_200_OK,
-            "data": serializer.data
-        }, status=status.HTTP_200_OK)
-
-
 '''
 the PUT AND PATCH functionality
 '''
