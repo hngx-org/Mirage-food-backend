@@ -9,6 +9,6 @@ router = DefaultRouter()
 router.register("", OrganizationAPI, basename="organization")
 
 urlpatterns = [
-    path("", include(router.urls))
-    # path("<int:pk>/", OrganizationAPI.as_view({"put": "update"}), name="organization"),
+    path("", include(router.urls)),
+    path("organization/int:pk/", OrganizationAPI.as_view({"put": "update"}), name="organization"),
 ]

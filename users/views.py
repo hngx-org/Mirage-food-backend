@@ -1,11 +1,11 @@
-<<<<<<< HEAD
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
-
 from .serializers import UserListSerializer
+
+# Create your views here.
 
 class UserListViewSet(APIView):
     def get(self, request, *args, **kwargs):
@@ -20,14 +20,6 @@ class UserListViewSet(APIView):
             "statusCode": status.HTTP_200_OK,
             "data": serializer.data
         }, status=status.HTTP_200_OK)
-=======
-from django.shortcuts import render
-from rest_framework.views import APIView
-from .models import User
-from rest_framework.response import Response
-from rest_framework import status
-
-# Create your views here.
 
 class DeleteUserView:
 
@@ -44,4 +36,3 @@ class DeleteUserView:
         user = self.get_user_by_pk(pk=id)
         user.delete()
         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
->>>>>>> 09660409e1064978d8aae6d574823432d99e4f79
