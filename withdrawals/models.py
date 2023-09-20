@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import CustomUser
 
 # Create your models here.
 class Withdrawal(models.Model):
@@ -6,7 +7,7 @@ class Withdrawal(models.Model):
         ('redeemed', "Redeemed"),
         ('not_redeemed', 'Not Redeemed'),
     ]
-    user_id = models.IntegerField()
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     status = models.CharField(verbose_name='withdrawal status', choices=status_choices, max_length=20,default='not_redeemed')
     amount = models.DecimalField(verbose_name='withdrawal amount',max_digits=10,decimal_places=2)
     created_at = models.DateTimeField(verbose_name='withdrawal timestamp', auto_now_add=True)
