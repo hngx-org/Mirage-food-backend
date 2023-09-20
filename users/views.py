@@ -15,7 +15,7 @@ UserModel = get_user_model()
 class SearchUserView(APIView):
 	"Api view accepting either a name or email parameter to search for a user"
 
-	def get_object(self, param):
+	def get_object(self, param:str):
 		try:
 			return UserModel.objects.get(name=param)
 		except UserModel.DoesNotExist:
@@ -24,7 +24,7 @@ class SearchUserView(APIView):
 			except UserModel.DoesNotExist:
 				raise Http404
 
-	def get(self, request, name_or_email, *args, **kwargs):
+	def get(self, request, name_or_email:str, *args, **kwargs):
 		instance = self.get_object(name_or_email)
 		serializer = SearchedUserSerializer(instance)
 		data = {
