@@ -35,7 +35,6 @@ class User(PermissionsMixin, AbstractBaseUser):
     profile_pic = CloudinaryField(_("profile pic"))
     email = models.EmailField(_("email address"), max_length=225,unique=True)
     phone = models.CharField(_("phone number"), max_length=20, null=True, blank=True)
-    is_admin = models.BooleanField(_("is admin"), blank=True, null=True)
     refresh_token = models.TextField(_("refresh token"), blank=True, null=True)
     bank_number = models.CharField(_("bank number"), max_length=50, blank=True, null=True)
     bank_code = models.CharField(_("bank code"), max_length=50, blank=True, null=True)
@@ -43,7 +42,8 @@ class User(PermissionsMixin, AbstractBaseUser):
     created_at = models.DateTimeField(_("created date"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated date"), auto_now=True)
     lunch_credit_balance = models.CharField(_("lunch credit"), max_length=50)
-
+    is_active = models.BooleanField(default=True)  # Add is_active field
+    is_staff = models.BooleanField(default=False) 
     groups = models.ManyToManyField('auth.Group',verbose_name='groups',blank=True,related_name='custom_users_groups')
     user_permissions = models.ManyToManyField('auth.Permission',verbose_name='user permissions',blank=True,related_name='custom_users_permissions')
 
