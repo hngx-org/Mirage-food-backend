@@ -13,8 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os 
 from decouple import config
-import cloudinary,
-import cloudinary.uploader,
+import cloudinary
+import cloudinary.uploader
 import cloudinary.api
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'withdrawals',
+    'lunches',
+    'organization',
     'rest_framework',
 ]
 

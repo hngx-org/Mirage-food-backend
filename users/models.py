@@ -6,6 +6,7 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from cloudinary.models import CloudinaryField
+from organization.models import Organization
 
 
 class UserManager(BaseUserManager):
@@ -63,6 +64,9 @@ class User(PermissionsMixin, AbstractBaseUser):
     created_at = models.DateTimeField(_("created date"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated date"), auto_now=True)
     is_deleted = models.BooleanField(_("deleted user"), default=False)
+
+    groups = models.ManyToManyField('auth.Group',verbose_name='groups',blank=True,related_name='custom_users_groups')
+    user_permissions = models.ManyToManyField('auth.Permission',verbose_name='user permissions',blank=True,related_name='custom_users_permissions')
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
