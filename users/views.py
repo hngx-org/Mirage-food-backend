@@ -1,16 +1,17 @@
 from django.shortcuts import render
 #uncomment when serializer class and model class is created
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
 #from .models import User
 #from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status, authentication
+from rest_framework.permissions import IsAuthenticated
 
 @csrf_exempt
 @api_view(['GET'])
-@permissionClasses([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def get_user(request, *args, **kwargs):
     """
     Get a particular user from user_id or email
