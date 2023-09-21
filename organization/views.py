@@ -1,19 +1,16 @@
 from rest_framework import authentication
 from rest_framework.views import APIView
-
-
-from .models import OrganizationInvites
 from .serializers import ListInvitesSerializer
 from .permissions import OrganisationAdmin
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from .models import Organization, OrganizationLunchWallet, OrganizationInvites
 from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
 from .serializers import OrganizationSerializer
 from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
-
-from .models import Organization
-
 
 # Create your views here.
 
@@ -30,6 +27,19 @@ class ListInvitesView(APIView):
         invites = OrganizationInvites.objects.filter(org_id=user.org_id)
         return Response(ListInvitesSerializer(invites).data)
 
+def organization_balance(request, organization_id):
+    
+    organization = get_object_or_404(Organization, id=organization_id)
+
+    # Query the OrganizationLunchWallet model to get the balance for this organization
+    lunch_wallet = OrganizationLunchWallet.objects.filter(org_id=organization_id).first()
+
+    if lunch_wallet:
+        balance = lunch_wallet.balance
+    else:
+        balance = 0.00  # default balance if no lunch wallet record exists
+
+    return JsonResponse({'organization_balance': balance})
 
 @api_view(['GET'])
 def get_organization(request, user_id, org_id):

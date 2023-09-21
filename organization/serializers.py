@@ -7,7 +7,6 @@ class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
     """
     Serializer for organization lunch model
     """
-
     class Meta:
         model = OrganizationLunchWallet
         fields = ['balance', 'orgnization']

@@ -1,9 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 
-# Create your models here.
-
-
 class Organization(models.Model):
     name = models.CharField(max_length=255, blank=False, null=False)
     lunch_price = models.DecimalField(
