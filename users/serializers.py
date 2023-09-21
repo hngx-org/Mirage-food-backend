@@ -8,10 +8,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
         
     def create(self, validated_data):
-<<<<<<< HEAD
         user = CustomUser.objects.create_user(**validated_data)
         return user
-=======
         user = User.objects.create_user(**validated_data)
         return user
     
@@ -19,4 +17,3 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'org_id', 'first_name', 'last_name', 'profile_pic', 'email', 'phone', 'created_at', 'updated_at', 'lunch_credit_balance']
->>>>>>> 5dec6a69ca57e6779e69eb9872c9c3600e6fc30f

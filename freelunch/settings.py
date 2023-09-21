@@ -84,7 +84,7 @@ WSGI_APPLICATION = "freelunch.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-<<<<<<< HEAD
+
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': config('DB_NAME'),
@@ -92,13 +92,6 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'Localhost': config('HOST'),
         'Port': config('PORT')
-=======
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
->>>>>>> 5dec6a69ca57e6779e69eb9872c9c3600e6fc30f
     }
 }
 
