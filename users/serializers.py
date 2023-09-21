@@ -1,8 +1,5 @@
-from .models import CustomUser
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-
-UserModel = get_user_model()
+from .models import User as CustomUser
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,5 +16,5 @@ class SearchedUserSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='pk')
     profile_picture = serializers.ImageField(source='profile_pic')
     class Meta:
-        model = UserModel 
+        model = CustomUser 
         fields = ['user_id', 'first_name', 'last_name', 'email', 'profile_picture']
