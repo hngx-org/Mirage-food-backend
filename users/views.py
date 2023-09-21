@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from .models import User
 from .serializers import UserListSerializer
 
+from .serializers import SearchedUserSerializer
 from django.http import Http404
 
 # Create your views here.
