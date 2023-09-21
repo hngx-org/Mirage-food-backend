@@ -10,18 +10,6 @@ from .models import Organization
 
 # Create your views here.
 @api_view(['GET'])
-def get_user(request, user_id, org_id):
-    try:
-        users = User.objects.filter(org_id=org_id)
-        if users.id == user_id:
-            serializer = UserSerializer(users)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'User Not found in this Organisation'}, status=status.HTTP_404_NOT_FOUND)
-    except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
-@api_view(['GET'])
 def get_organization(request, user_id, org_id):
     try:
         user = User.objects.get(pk=user_id)

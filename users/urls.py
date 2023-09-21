@@ -2,6 +2,7 @@ from django.urls import path
 from users import views
 
 urlpatterns = [
+    path('organization/<int:org_id>/user/<int:user_id>', UserViewSet.as_view, name='get-org_user'),
     path('users/', UserListViewSet.as_view(), name='users-list'),
     path('users/login', LoginView.as_view()),
     path('users/<int:id>/', DeleteUserView.as_view()),

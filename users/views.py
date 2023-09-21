@@ -1,11 +1,10 @@
 from rest_framework.views import APIView
 from .models import User
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, viewsets
 
-from .serializers import UserListSerializer
+from .serializers import UserListSerializer, UserSerializer
 
-# Create your views here.
 from rest_framework import generics, permissions
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -50,6 +49,25 @@ class LoginView(ObtainAuthToken):
         response_data["user"] = UserSerializer(user).data
 
         return Response(response_data)
+
+class UserViewSet(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        try:
+            org_id = self.kwargs['org_id']
+            user_id = self.kwargs['user_id']
+            user = User.objects.filter(org_id=org_id, id=user_id)
+            serialize = UserSerializer(user)
+            return Response(
+                {'Message': 'User Deleted',
+                 'data': serialize.data
+                 }, status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response({
+                'error': 'User does not exist'
+            }, status=status.HTTP_404_NOT_FOUND)
+
 
 
 class DeleteUserView:
