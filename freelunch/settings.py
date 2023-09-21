@@ -37,20 +37,21 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'users',
-    'withdrawals',
-    'lunches',
-    'organization',
-    'rest_framework',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "users",
+    "withdrawals",
+    "lunches",
+    "organization",
+    "rest_framework",
+    "rest_framework.authtoken",
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = [   
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -94,6 +95,15 @@ DATABASES = {
     }
 }
 
+# pagination
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -113,10 +123,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# AUTHENTICATION_BACKENDS = [
-#     'django.contrib.auth.backends.ModelBackend',
-#     'users.backends.CustomBackend',
-# ]
+# JWT_AUTH = {
+#     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),  # Token expiration time
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -136,7 +145,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 
-# cloudinary config for profile picture upload
+# cloudinary cgit onfig for profile picture upload
 cloudinary.config(
     cloud_name = config('CLOUDINARY_CLOUD_NAME'),
     api_key = config('CLOUDINARY_API_KEY'),
