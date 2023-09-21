@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import OrganizationLunchWallet
+from .models import OrganizationLunchWallet
 
 
 class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
@@ -8,4 +8,4 @@ class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = OrganizationLunchWallet
-        fields = ['balance', 'orgnization']
+        fields = ['balance', 'org_id']
