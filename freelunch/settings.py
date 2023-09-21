@@ -27,8 +27,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 
-
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -119,7 +117,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -141,12 +138,13 @@ SIMPLE_JWT = {
 
   # ...
 }
+#=========
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'users.backends.CustomBackend',
 ]
 
-
+#>>>>>>> dc1746b6069a3f236c31f239767ffea81a91b58b
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

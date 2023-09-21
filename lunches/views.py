@@ -37,7 +37,7 @@ class CreateFreeLunchAPIView(APIView):
         data = []
         
         for receiver_id in receivers_list:
-
+    
             try:
                 # Attempt to fetch the receiver instance based on the receiver_id
                 receiver = User.objects.get(id=int(receiver_id))
@@ -53,9 +53,7 @@ class CreateFreeLunchAPIView(APIView):
                 error = str(e)
                 return Response({'message': error}, status=status.HTTP_400_BAD_REQUEST)
 
-        lunch_balance = lunch_wallet.balance
         return Response({"message": "Lunch request created successfully",
                          "statusCode": 201,
-                         "walletBalance": lunch_balance,
                          "data": data})
 
