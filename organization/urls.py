@@ -13,5 +13,7 @@ urlpatterns = [
     path("", include(router.urls)),
     path("organization/<int:pk>/", OrganizationAPI.as_view({"put": "update"}), name="organization"),
     path('users/<int:user_id>/organizations/<int:org_id>', views.get_organization, name='get-organization'),
+    path('get_balance/<int:organization_id>/', views.organization_balance, name='get_balance'),
+
 
 ]
