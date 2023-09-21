@@ -88,8 +88,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
-        'PASSWORD':config('DB_PASSWORD')
-        }
+        'PASSWORD': config('DB_PASSWORD'),
+        'Localhost': config('HOST'),
+        'Port': config('PORT')
+    }
 }
 
 #pagination
