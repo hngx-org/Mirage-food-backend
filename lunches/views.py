@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -61,7 +60,6 @@ class CreateFreeLunchAPIView(APIView):
                          "statusCode": 201,
                          "data": data})
 
-=======
 from rest_framework.decorators import api_view
 from .models import Lunch
 from rest_framework.response import Response
@@ -128,4 +126,3 @@ class LunchDetailView(APIView):
         lunch = get_object_or_404(Lunch, sender_id=user_id, id=lunch_id)
         serializer = LunchSerializer(lunch)
         return Response(serializer.data)
->>>>>>> 5dec6a69ca57e6779e69eb9872c9c3600e6fc30f

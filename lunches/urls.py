@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from django.contrib import admin
 from django.urls import path
 from . views import CreateFreeLunchAPIView
@@ -15,11 +14,9 @@ urlpatterns = [
 # urlpatterns = [
 #     path('lunch/<int:id>', views.get_a_lunch, name='get_a_free_lunch'),
 # ]
-=======
-from  django.urls import path
-from .views import allFreeLunchesListView
+# from  django.urls import path
+# from .views import allFreeLunchesListView
 
-urlpatterns = [
-   path("lunch/all", allFreeLunchesListView.as_view(), name="lunch-list"), 
-]
->>>>>>> 5dec6a69ca57e6779e69eb9872c9c3600e6fc30f
+# urlpatterns = [
+#    path("lunch/all", allFreeLunchesListView.as_view(), name="lunch-list"), 
+# ]
