@@ -23,11 +23,13 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, **extra_fields):
-        # extra_fields.setdefault('org_id', 1)
-        # extra_fields.setdefault('is_admin',True)
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
 
-        # if not extra_fields.get('is_admin'):
-        #     raise ValueError(_('Superuser must have is_admin=True.'))
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, password, **extra_fields)
 
@@ -35,38 +37,31 @@ class UserManager(BaseUserManager):
 class User(PermissionsMixin, AbstractBaseUser):
     # by default django uses auto increament for the id
     # uncomment org_id when organization model has been created
-    # org_id = models.ForeignKey("app.Model", verbose_name=_("organisation name"), on_delete=models.CASCADE,null=True)
+    org_id = models.ForeignKey(Organization, verbose_name=_(
+        "organisation name"), on_delete=models.CASCADE, null=True)
     first_name = models.CharField(_("first name"), max_length=225)
-    last_name = models.CharField(_("last name"), max_length=225, blank=True, null=True)
+    last_name = models.CharField(
+        _("last name"), max_length=225, blank=True, null=True)
     profile_pic = CloudinaryField(_("profile pic"))
-    email = models.EmailField(
-        _("email address"), max_length=225, db_index=True, unique=True
-    )
-    phone = models.CharField(_("phone number"), max_length=20, null=True, blank=True)
-    password_hash = models.CharField(max_length=100)
-    is_admin = models.BooleanField(_("is admin"), blank=True, null=True)
-    lunch_credit_balance = models.PositiveIntegerField(_("launch credit"))
+    email = models.EmailField(_("email address"), max_length=225, unique=True)
+    phone = models.CharField(
+        _("phone number"), max_length=20, null=True, blank=True)
     refresh_token = models.TextField(_("refresh token"), blank=True, null=True)
     bank_number = models.CharField(
-        _("bank number"), max_length=50, blank=True, null=True
-    )
-    bank_code = models.CharField(_("bank code"), max_length=50, blank=True, null=True)
-    bank_name = models.CharField(_("bank name"), max_length=50, blank=True, null=True)
-    bank_region = models.CharField(
-        _("bank region"), max_length=50, blank=True, null=True
-    )
-    currency = models.CharField(
-        _("country currency"), max_length=128, blank=True, null=True
-    )
-    currency_code = models.CharField(
-        _("country code"), max_length=4, blank=True, null=True
-    )
+        _("bank number"), max_length=50, blank=True, null=True)
+    bank_code = models.CharField(
+        _("bank code"), max_length=50, blank=True, null=True)
+    bank_name = models.CharField(
+        _("bank name"), max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(_("created date"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated date"), auto_now=True)
-    is_deleted = models.BooleanField(_("deleted user"), default=False)
-
-    groups = models.ManyToManyField('auth.Group',verbose_name='groups',blank=True,related_name='custom_users_groups')
-    user_permissions = models.ManyToManyField('auth.Permission',verbose_name='user permissions',blank=True,related_name='custom_users_permissions')
+    lunch_credit_balance = models.CharField(_("lunch credit"), max_length=50)
+    is_active = models.BooleanField(default=True)  # Add is_active field
+    is_staff = models.BooleanField(default=False)
+    groups = models.ManyToManyField(
+        'auth.Group', verbose_name='groups', blank=True, related_name='custom_users_groups')
+    user_permissions = models.ManyToManyField(
+        'auth.Permission', verbose_name='user permissions', blank=True, related_name='custom_users_permissions')
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
