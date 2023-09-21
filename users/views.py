@@ -36,36 +36,12 @@ class UserRetrieveUpdateSet(APIView):
             "data": serializer.data
         }, status=status.HTTP_200_OK)
 
-    def put(self, request, id, format=None):
-        """
-        Update the user details
-        """
-        user = self.get_object(id)
-        serializer = UserListSerializer(user, data=request.data)
+class DeleteUserView:
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                "message": "Successfully updated user information",
-                "statusCode": status.HTTP_200_OK,
-                "data": serializer.data
-            }, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# the patch function
-    '''
-    The patch method is responsible for performing the patch operation on the endpoint.
-    That it make it possible to partially update the user details
-    '''
-
-    def patch(self, request, id, format=None):
-        """
-        Partially update user details
-        """
-        user = self.get_object(id)
-
-        if user is None:
+    def get_user_by_pk(self, id):
+        try:
+            return User.objects.get(id=id)
+        except:
             return Response({
                 "message": f"User with pk {id} does not exist.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
