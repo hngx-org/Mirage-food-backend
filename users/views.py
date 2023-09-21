@@ -2,9 +2,7 @@ from rest_framework.views import APIView
 from .models import User
 from rest_framework.response import Response
 from rest_framework import status
-from .models import User
 
-from .models import User
 from .serializers import UserListSerializer
 
 # Create your views here.
@@ -46,7 +44,7 @@ class DeleteUserView(APIView):
             return User.objects.get(pk=id)
         except:
             return Response({
-                'error': 'User does not exist'
+                'error': 'User does not exist.'
             }, status=status.HTTP_404_NOT_FOUND)
 
 
