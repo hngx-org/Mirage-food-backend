@@ -2,8 +2,6 @@ from .models import User
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-# UserModel = get_user_model()
-
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -13,11 +11,15 @@ class CustomUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
-
+    
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'org_id', 'first_name', 'last_name', 'profile_pic', 'email', 'phone', 'created_at', 'updated_at', 'lunch_credit_balance']
 
 class SearchedUserSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='pk')
     profile_picture = serializers.ImageField(source='profile_pic')
     class Meta:
-        model = User
+        model = User 
         fields = ['user_id', 'first_name', 'last_name', 'email', 'profile_picture']

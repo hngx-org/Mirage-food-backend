@@ -34,4 +34,4 @@ class Lunch(models.Model):
         verbose_name_plural = "Lunches"
 
     def __str__(self):
-        return f"{self.sender} sent a lunch to {self.receiver}"
+        return f"{self.sender_id} sent a lunch to {self.receiver_id}"

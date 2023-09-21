@@ -1,16 +1,7 @@
-from .models import Lunch
 from rest_framework import serializers
+from .models import Lunch
 
-
-class LunchSerializers(serializers.ModelSerializer):
+class LunchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lunch
-        fields = [
-            "id",
-            "quantity",
-            "redeemed",
-            "note",
-            "created_at",
-            "sender",
-            "receiver",
-        ]
+        fields = ['receiverID', 'senderID', 'quantity', 'redeemed', 'note', 'created_at', 'id']
