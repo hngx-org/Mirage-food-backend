@@ -4,30 +4,41 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from django.contrib.auth.models import User
+from users.models import User
 from .models import Lunch
 from .serializers import LunchSerializer
 import ast
 from organization.models import Organization, OrganizationLunchWallet
+from rest_framework.authentication import SessionAuthentication  # Import the SessionAuthentication class if you want to use it for a specific view
+from rest_framework.permissions import AllowAny
 
 class CreateFreeLunchAPIView(APIView):
-    authentication_classes = [JWTAuthentication]  # Use JWT Authentication
-    permission_classes = [IsAuthenticated]
+    #
+    # permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        # Get data from the request body
-        user = request.user
+        # Get data from the rest body
+        #user = request.user
+        user = User.objects.get(email="abdullahishuaibumaje@gmail.com")
         receivers = request.data.get('receivers')
-        receivers_list = ast.literal_eval(receivers)
-        quantity = request.data.get('quantity', 0)
-        note = request.data.get('note', '')
+        try:
+            receivers_list = ast.literal_eval(receivers)
+            quantity = request.data.get('quantity', 0)
+            note = request.data.get('note', '')
+        except Exception as e:
+            error=str(e)
+            return Response({'message':error})
 
         # Validate the data as needed
-        if not receivers:
+        if not receivers_list:
             return Response({"message": "Receivers field is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         data = []
-        organization_id = 1  # Assuming organization ID is 1
+        try:
+            organization_id = user.org_id.id
+        except:
+
+            return  Response({'message':"user does not have an organisation"})
 
         try:
             organization = Organization.objects.get(id=organization_id)
@@ -44,14 +55,14 @@ class CreateFreeLunchAPIView(APIView):
 
                 # Calculate the lunch cost
                 price = organization.lunch_price
-                total_cost = quantity * price
+                total_cost = int(quantity)* int(price)
 
                 # Check if the organization has sufficient balance
                 if lunch_wallet.balance < total_cost:
                     return Response({'detail': 'Insufficient balance in the organization lunch wallet.'}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Create the Lunch object with the receiver instance
-                lunch = Lunch.objects.create(sender=user, receiver=receiver, note=note, quantity=quantity)
+                lunch = Lunch.objects.create(sender_id=user, receiver=receiver, note=note, quantity=quantity)
 
                 # Update the organization lunch wallet balance
                 lunch_wallet.balance -= total_cost
