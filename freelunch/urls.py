@@ -44,7 +44,6 @@ urlpatterns = [
     path('api/',include('users.urls')),
     path('api/', include('lunches.urls')),
     path('api/', include('withdrawals.urls') ),
-    path('api/',include('users.urls'))
     
     re_path(
         r'^swagger(?P<format>\.json|\.yaml)$',
