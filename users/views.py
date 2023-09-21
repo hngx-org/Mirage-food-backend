@@ -3,40 +3,25 @@ from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from .serializers import LoginSerializer, CustomUserSerializer
 from .models import User
+from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate, login
 
-class LoginView(ObtainAuthToken):
+
+class LoginView(APIView):
     def post(self, request, *args, **kwargs):
+    # Get username and password from the request
+        email = request.data.get('email')
+        password = request.data.get('password')
 
-        email = request.data.get("email")
-        password = request.data.get("password")
- 
-        if not self.request.data.get("email") or not self.request.data.get("password"):
-            raise ValidationError({"message": "Email and Password must be provided"})
-        
-        user = User.objects.filter(email=email).first()
+        # Authenticate the user
+        user = authenticate(request, email=email, password=password)
 
-        if not user:
-            raise ValidationError({"message": "User does not exist"})
-        
-        if not user.is_active:
-            raise ValidationError({"message": "User not active"})
-        
-        if user.check_password(password):
-             raise ValidationError({"message": "Invalid Credentials"})
-         
-
-        token, created = Token.objects.get_or_create(user=user)
-
-        token_key = ""
-        if token:
-            token_key = token.key
-        elif created:
-            token_key = created.key
-
-        response_data = dict() 
-        response_data["message"] = "success"
-        response_data["token"] = token_key
-        response_data["user"] = CustomUserSerializer(user).data
-
-        return Response(response_data)
+        if user is not None:
+            # If authentication is successful, create or retrieve a token
+            token, created = Token.objects.get_or_create(user=user)
+            login(request, user)  # Optional: Log the user in
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
