@@ -1,4 +1,9 @@
+from rest_framework.response import Response
+from .serializers import UserRegistrationSerializer,UserListSerializer
+from .models import User
 from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
@@ -18,11 +23,14 @@ from .serializers import LoginSerializer
 from rest_framework.authtoken.models import Token
 
 
-class LoginView(ObtainAuthToken):
+class LoginView(APIView):
     def post(self, request, *args, **kwargs):
+    # Get username and password from the request
+        email = request.data.get('email')
+        password = request.data.get('password')
 
-        email = request.data.get("email")
-        password = request.data.get("password")
+        # Authenticate the user
+        user = authenticate(request, email=email, password=password)
 
         if not self.request.data.get("email") or not self.request.data.get("password"):
             raise ValidationError(
