@@ -3,14 +3,9 @@ from .models import Lunch
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-<<<<<<< HEAD
-from django.http import Http404 
-from .serializers import LunchSerializer
-=======
 from .serializers import LunchSerializer
 from django.http import Http404
 from django.shortcuts import get_object_or_404
->>>>>>> 5dec6a69ca57e6779e69eb9872c9c3600e6fc30f
 
 # Create your views here.
 
@@ -35,10 +30,6 @@ def update_free_lunch(request, id):
                 serializer = LunchSerializer(freelunch, data=request.data, partial=True)
                 if serializer.is_valid():
                         serializer.save()
-<<<<<<< HEAD
-                        return Response({"Lunch updated successfully": serializer.data}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-=======
                         return Response({
                         "message": "Lunch request created successfully",
                         "statusCode": 201,
@@ -73,4 +64,3 @@ class LunchDetailView(APIView):
         lunch = get_object_or_404(Lunch, sender_id=user_id, id=lunch_id)
         serializer = LunchSerializer(lunch)
         return Response(serializer.data)
->>>>>>> 5dec6a69ca57e6779e69eb9872c9c3600e6fc30f
