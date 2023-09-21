@@ -3,6 +3,9 @@ from rest_framework import status
 from users.models import User
 from .serializers import OrganizationSerializer
 from rest_framework.decorators import api_view
+from rest_framework import generics, viewsets
+
+from .models import Organization
 
 
 # Create your views here.
@@ -20,3 +23,13 @@ def get_organization(request, user_id, org_id):
             return Response({'error': 'Organization not found for this user'}, status=status.HTTP_404_NOT_FOUND)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
+    """Base view for organization update (put | patch)"""  # can be modified when adding other methods
+
+    serializer_class = OrganizationSerializer
+
+    def get_queryset(self):
+        return Organization.objects.all()
+
+    ...
