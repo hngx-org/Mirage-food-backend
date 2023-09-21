@@ -8,7 +8,7 @@ from users.models import User
 from .models import Lunch
 from .serializers import LunchSerializer
 import ast
-from organization.models import Organization, OrganizationLunchWallet
+from organization.models import Organization #OrganizationLunchWallet
 from rest_framework.authentication import SessionAuthentication  # Import the SessionAuthentication class if you want to use it for a specific view
 from rest_framework.permissions import AllowAny
 
@@ -42,11 +42,11 @@ class CreateFreeLunchAPIView(APIView):
 
         try:
             organization = Organization.objects.get(id=organization_id)
-            lunch_wallet = OrganizationLunchWallet.objects.get(org_id=organization)
+            #lunch_wallet = OrganizationLunchWallet.objects.get(org_id=organization)
         except Organization.DoesNotExist:
             return Response({"message": "Organization not found"}, status=status.HTTP_400_BAD_REQUEST)
-        except OrganizationLunchWallet.DoesNotExist:
-            return Response({"message": "Organization lunch wallet not found"}, status=status.HTTP_400_BAD_REQUEST)
+        #except OrganizationLunchWallet.DoesNotExist:
+            #return Response({"message": "Organization lunch wallet not found"}, status=status.HTTP_400_BAD_REQUEST)
 
         for receiver_id in receivers_list:
             try:
@@ -58,15 +58,15 @@ class CreateFreeLunchAPIView(APIView):
                 total_cost = int(quantity)* int(price)
 
                 # Check if the organization has sufficient balance
-                if lunch_wallet.balance < total_cost:
-                    return Response({'detail': 'Insufficient balance in the organization lunch wallet.'}, status=status.HTTP_400_BAD_REQUEST)
+                #if lunch_wallet.balance < total_cost:
+                    #return Response({'detail': 'Insufficient balance in the organization lunch wallet.'}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Create the Lunch object with the receiver instance
                 lunch = Lunch.objects.create(sender_id=user, receiver=receiver, note=note, quantity=quantity)
 
                 # Update the organization lunch wallet balance
-                lunch_wallet.balance -= total_cost
-                lunch_wallet.save()
+                #lunch_wallet.balance -= total_cost
+                #lunch_wallet.save()
 
                 # Serialize and append the lunch data
                 lunch_serialized = LunchSerializer(lunch)
@@ -77,10 +77,9 @@ class CreateFreeLunchAPIView(APIView):
                 error = str(e)
                 return Response({'message': error}, status=status.HTTP_400_BAD_REQUEST)
 
-        lunch_balance = lunch_wallet.balance
+        #lunch_balance = lunch_wallet.balance
         return Response({"message": "Lunch request created successfully",
                          "statusCode": 201,
-                         "walletBalance": lunch_balance,
                          "data": data})
 
 # from django.shortcuts import render
