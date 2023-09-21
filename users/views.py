@@ -1,9 +1,12 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
 
 from .models import User
 from .serializers import UserListSerializer
+from .serializers import UserRegistrationSerializer
 
 # Create your views here.
 
@@ -36,3 +39,9 @@ class DeleteUserView(APIView):
         user = self.get_user_by_pk(pk=id)
         user.delete()
         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class UserRegistrationView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegistrationSerializer
+    permission_classes = [AllowAny]
