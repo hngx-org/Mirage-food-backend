@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'rest_framework',
+    'organization',
 ]
 
 MIDDLEWARE = [
@@ -79,12 +80,15 @@ WSGI_APPLICATION = 'freelunch.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.sqlite3',  # Or your preferred database engine
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
-        'PASSWORD':config('DB_PASSWORD')
-        }
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': '',  # Empty for localhost
+        'PORT': '',  # Empty for default
+    }
 }
+
 
 #pagination
 REST_FRAMEWORK = {
