@@ -20,6 +20,7 @@ class CreateFreeLunchAPIView(APIView):
         # Get data from the rest body
         #user = request.user
         user = User.objects.get(email="abdullahishuaibumaje@gmail.com")
+        user_id=user.id
         receivers = request.data.get('receivers')
         try:
             receivers_list = ast.literal_eval(receivers)
@@ -34,40 +35,15 @@ class CreateFreeLunchAPIView(APIView):
             return Response({"message": "Receivers field is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         data = []
-        try:
-            organization_id = user.org_id.id
-        except:
-
-            return  Response({'message':"user does not have an organisation"})
-
-        try:
-            organization = Organization.objects.get(id=organization_id)
-            lunch_wallet = OrganizationLunchWallet.objects.get(org_id=organization)
-        except Organization.DoesNotExist:
-            return Response({"message": "Organization not found"}, status=status.HTTP_400_BAD_REQUEST)
-        except OrganizationLunchWallet.DoesNotExist:
-            return Response({"message": "Organization lunch wallet not found"}, status=status.HTTP_400_BAD_REQUEST)
-
+        
         for receiver_id in receivers_list:
+
             try:
                 # Attempt to fetch the receiver instance based on the receiver_id
                 receiver = User.objects.get(id=int(receiver_id))
 
-                # Calculate the lunch cost
-                price = organization.lunch_price
-                total_cost = int(quantity)* int(price)
-
-                # Check if the organization has sufficient balance
-                if lunch_wallet.balance < total_cost:
-                    return Response({'detail': 'Insufficient balance in the organization lunch wallet.'}, status=status.HTTP_400_BAD_REQUEST)
-
                 # Create the Lunch object with the receiver instance
                 lunch = Lunch.objects.create(sender_id=user, receiver=receiver, note=note, quantity=quantity)
-
-                # Update the organization lunch wallet balance
-                lunch_wallet.balance -= total_cost
-                lunch_wallet.save()
-
                 # Serialize and append the lunch data
                 lunch_serialized = LunchSerializer(lunch)
                 data.append(lunch_serialized.data)
