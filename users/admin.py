@@ -7,15 +7,18 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from .models import User
 
 # Register your models here.
+
+
 class UserCreationForm(forms.ModelForm):
-    #A form for creating new users. Includes all the required
-    #fields, plus a repeated password.
+    # A form for creating new users. Includes all the required
+    # fields, plus a repeated password.
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+    password2 = forms.CharField(
+        label='Password confirmation', widget=forms.PasswordInput)
 
     class Meta:
         model = User
-        fields = ('email','first_name','last_name', 'bank_name')
+        fields = ('email', 'first_name', 'last_name', 'bank_name')
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -32,11 +35,12 @@ class UserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-    
+
+
 class UserChangeForm(forms.ModelForm):
-#A form for updating users. Includes all the fields on
-#the user, but replaces the password field with admin's
-#password hash display field.
+    # A form for updating users. Includes all the fields on
+    # the user, but replaces the password field with admin's
+    # password hash display field.
 
     password = ReadOnlyPasswordHashField()
 
@@ -49,7 +53,8 @@ class UserChangeForm(forms.ModelForm):
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
         return self.initial["password"]
-    
+
+
 class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
@@ -69,12 +74,13 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email','password1', 'password2')}
-        ),
+            'fields': ('email', 'password1', 'password2')}
+         ),
     )
     search_fields = ('email',)
     ordering = ('email',)
     filter_horizontal = ()
+
 
 # Now register the new UserAdmin...
 admin.site.register(User, UserAdmin)

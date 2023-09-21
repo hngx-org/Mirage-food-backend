@@ -138,13 +138,11 @@ SIMPLE_JWT = {
 
   # ...
 }
-#=========
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'users.backends.CustomBackend',
 ]
-
-#>>>>>>> dc1746b6069a3f236c31f239767ffea81a91b58b
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -171,11 +169,9 @@ cloudinary.config(
     api_secret = config('CLOUDINARY_API_SECRET')
 )
 
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = 'users.User'
-
