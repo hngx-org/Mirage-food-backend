@@ -1,7 +1,6 @@
-from django.urls import path, re_path, include
-
-from . import views
+from  django.urls import path
+from .views import allFreeLunchesListView
 
 urlpatterns = [
-    path('lunch/<int:id>', views.get_a_lunch, name='get_a_free_lunch'),
+   path("lunch/all", allFreeLunchesListView.as_view(), name="lunch-list"), 
 ]
