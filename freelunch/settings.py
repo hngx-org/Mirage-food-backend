@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = [   
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -99,6 +99,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ]
 }
 
@@ -145,7 +146,7 @@ STATIC_URL = "static/"
 
 # MEDIA_URL = os.path.join(BASE_DIR, 'media/')
 
-# cloudinary config for profile picture upload
+# cloudinary cgit onfig for profile picture upload
 cloudinary.config(
     cloud_name=config("CLOUDINARY_CLOUD_NAME"),
     api_key=config("CLOUDINARY_API_KEY"),
