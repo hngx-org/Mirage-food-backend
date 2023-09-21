@@ -11,7 +11,11 @@ six==1.16.0
 sqlparse==0.4.4
 typing_extensions==4.8.0
 <<<<<<< HEAD
+<<<<<<< HEAD
 urllib3==1.26.16
 =======
 urllib3==1.26.16
 >>>>>>> 5dec6a69ca57e6779e69eb9872c9c3600e6fc30f
+=======
+urllib3==1.26.16
+>>>>>>> 61f328dee497fbcbfd352ac01075f5d666a17e4b

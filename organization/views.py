@@ -9,23 +9,18 @@ from .models import Organization
 
 
 # Create your views here.
-@api_view(['POST'])
-def post(request, *args, **kwargs):
-        serialize = OrganizationSerializer(data=request.data)
-        if serialize.is_valid():
-            serialize.save()
-            return Response({
-                'data': serialize.data,
-                'message': 'Successful'
-                }, status=status.HTTP_201_CREATED)
+@api_view(['GET'])
+def get_user(request, user_id, org_id):
+    try:
+        org = User.objects.get(org_id=org_id)
+        user = User.objects.get(pk=user_id)
+        if org.org_id and user.org_id == org_id:
+            serializer = OrganizationSerializer(organization)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            default = serialize.errors
-            error = {}
-            for field_name, field_errors in default.items():
-                error[field_name] = field_errors[0]
-            return Response({
-                'message': 'Bad Request',
-                'error': error}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'User Not found in this Organisation'}, status=status.HTTP_404_NOT_FOUND)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def get_organization(request, user_id, org_id):
@@ -47,6 +42,5 @@ class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
 
     def get_queryset(self):
         return Organization.objects.all()
-
 
     ...
