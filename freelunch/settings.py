@@ -152,11 +152,11 @@ cloudinary.config(
 # MEDIA_URL = os.path.join(BASE_DIR, 'media/')
 
 # cloudinary config for profile picture upload
-cloudinary.config(
-    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
-    api_key = config('CLOUDINARY_API_KEY'),
-    api_secret = config('CLOUDINARY_API_SECRET')
-)
+# cloudinary.config(
+#     cloud_name = config('CLOUDINARY_CLOUD_NAME'),
+#     api_key = config('CLOUDINARY_API_KEY'),
+#     api_secret = config('CLOUDINARY_API_SECRET')
+# )
 
 
 # Default primary key field type
