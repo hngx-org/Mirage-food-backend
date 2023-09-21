@@ -17,6 +17,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, **extra_fields):
+<<<<<<< Updated upstream
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser',True)
         
@@ -24,6 +25,13 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
+=======
+        extra_fields.setdefault('org_id', 1)
+        extra_fields.setdefault('is_admin',True)
+        
+        if not extra_fields.get('is_admin'):
+            raise ValueError(_('Superuser must have is_admin=True.'))
+>>>>>>> Stashed changes
         
         return self.create_user(email, password, **extra_fields)
 
@@ -37,6 +45,10 @@ class User(PermissionsMixin, AbstractBaseUser):
     profile_pic = CloudinaryField(_("profile pic"))
     email = models.EmailField(_("email address"), max_length=225,unique=True)
     phone = models.CharField(_("phone number"), max_length=20, null=True, blank=True)
+<<<<<<< Updated upstream
+=======
+    is_admin = models.BooleanField(_("is admin"), blank=True, null=True)
+>>>>>>> Stashed changes
     refresh_token = models.TextField(_("refresh token"), blank=True, null=True)
     bank_number = models.CharField(_("bank number"), max_length=50, blank=True, null=True)
     bank_code = models.CharField(_("bank code"), max_length=50, blank=True, null=True)
@@ -44,8 +56,12 @@ class User(PermissionsMixin, AbstractBaseUser):
     created_at = models.DateTimeField(_("created date"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated date"), auto_now=True)
     lunch_credit_balance = models.CharField(_("lunch credit"), max_length=50)
+<<<<<<< Updated upstream
     is_active = models.BooleanField(default=True)  # Add is_active field
     is_staff = models.BooleanField(default=False) 
+=======
+
+>>>>>>> Stashed changes
     groups = models.ManyToManyField('auth.Group',verbose_name='groups',blank=True,related_name='custom_users_groups')
     user_permissions = models.ManyToManyField('auth.Permission',verbose_name='user permissions',blank=True,related_name='custom_users_permissions')
 

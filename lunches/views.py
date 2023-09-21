@@ -1,3 +1,7 @@
+<<<<<<< Updated upstream
+=======
+from django.shortcuts import render
+>>>>>>> Stashed changes
 from rest_framework.decorators import api_view
 from .models import Lunch
 from rest_framework.response import Response
@@ -29,6 +33,7 @@ def update_free_lunch(request, id):
                 if serializer.is_valid():
                         serializer.save()
                         return Response({"Lunch updated successfully": serializer.data}, status=status.HTTP_200_OK)
+<<<<<<< Updated upstream
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Create your views here.
@@ -57,3 +62,6 @@ def get_a_lunch(request, id):
             "id": lunch.id
         }
     }, status=status.HTTP_201_CREATED)
+=======
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+>>>>>>> Stashed changes

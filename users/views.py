@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,6 +23,17 @@ class UserListViewSet(APIView):
         }, status=status.HTTP_200_OK)
 
 class DeleteUserView(APIView):
+=======
+from django.shortcuts import render
+from rest_framework.views import APIView
+from .models import User
+from rest_framework.response import Response
+from rest_framework import status
+
+# Create your views here.
+
+class DeleteUserView:
+>>>>>>> Stashed changes
 
     def get_user_by_pk(self, pk):
         try:
