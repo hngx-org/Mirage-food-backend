@@ -5,13 +5,6 @@ from rest_framework.views import APIView
 from .models import User
 from .serializers import UserListSerializer
 
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
-from .models import User
-from .serializers import UserListSerializer
-
 # Beginning of the user update
 class UserRetrieveUpdateSet(APIView):
     def get_object(self, pk):
