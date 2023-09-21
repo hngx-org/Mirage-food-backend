@@ -6,7 +6,7 @@ from rest_framework import status
 
 # Create your views here.
 
-class DeleteUserView:
+class DeleteUserView(APIView):
 
     def get_user_by_pk(self, pk):
         try:
