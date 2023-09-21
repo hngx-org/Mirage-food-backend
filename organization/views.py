@@ -55,7 +55,7 @@ class OrganizationInviteCreateView(APIView):
 
             # Creates and save the organization invite to the database
             invite = OrganizationInvites(
-                org_id=request.user.organization,  
+                org_id=request.user.org_id,  
                 email=serializer.validated_data["email"],
                 token=invite_token,
             )
@@ -63,8 +63,8 @@ class OrganizationInviteCreateView(APIView):
 
             # Send an email invitation to the invitee
             try:
-                email_subject = f"Invitation to Join  {request.user.organization.name}"
-                email_body = f"You are invited to join our organization. Use this token: {invite_token}"
+                email_subject = f"Invitation to Join  {request.user.org_id.name}"
+                email_body = f"You are invited to join our organization - {request.user.org_id.name}. Use this token: {invite_token}"
                 email = EmailMessage(email_subject, email_body, from_email= "freelunch - mirage", to=[serializer.validated_data['email']])
                 email.send()
             except Exception as Error:
