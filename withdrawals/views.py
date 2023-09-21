@@ -16,9 +16,6 @@ class LunchWithdrawalCreateView(APIView):
 
             
             withdrawal = Withdrawal.objects.create(
-                bank_name=serializer.validated_data["bank_name"],
-                bank_number=serializer.validated_data["bank_number"],
-                bank_code=serializer.validated_data["bank_code"],
                 amount=serializer.validated_data["amount"],
                 user_id=request.user
             )
