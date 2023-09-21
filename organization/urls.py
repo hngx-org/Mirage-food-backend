@@ -1,3 +1,5 @@
+from django.urls import path
+from .views import OrganizationLunchWalletView
 from . import views
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
@@ -9,6 +11,7 @@ router = DefaultRouter()
 router.register("", OrganizationAPI, basename="organization")
 
 urlpatterns = [
+    path('create/', OrganizationLunchWalletView.as_view(), name='create'),
     path("", include(router.urls)),
     path("organization/<int:pk>/",OrganizationAPI.as_view({"put": "update"}), name="organization"),
     path("organization/invitations", views.ListInvitesView.as_view()),
