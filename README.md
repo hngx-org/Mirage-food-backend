@@ -10,11 +10,11 @@
 ## Contributing Rules
 1. Clone repository
  ```bash
-git clone   git@github.com:hngx-org/Mirage-food-backend.git 
+git clone git@github.com:mwiks-dev/AskGiver.git 
 ```
 or
  ```bash
-git clone https://github.com/hngx-org/Mirage-food-backend.git
+git clone https://github.com/mwiks-dev/AskGiver.git 
 ```
 
 2. Checkout to a branch using the following format ft-<feature-being-developed>(e.g git checkout -b ft-getallusers)
