@@ -6,7 +6,7 @@ from .models import User
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 
-from .serializers import UserListSerializer, UserSerializer
+from .serializers import UserListSerializer
 from .serializers import UserRegistrationSerializer
 
 from rest_framework import generics, permissions
@@ -14,7 +14,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
-from .serializers import LoginSerializer, UserSerializer
+from .serializers import LoginSerializer
 from rest_framework.authtoken.models import Token
 
 
@@ -55,14 +55,14 @@ class LoginView(ObtainAuthToken):
         return Response(response_data)
 
 class UserViewSet(viewsets.ModelViewSet):
-    serializer_class = UserSerializer
+    serializer_class = UserListSerializer
 
     def get_queryset(self):
         try:
             org_id = self.kwargs['org_id']
             user_id = self.kwargs['user_id']
             user = User.objects.filter(org_id=org_id, id=user_id)
-            serialize = UserSerializer(user)
+            serialize = UserListSerializer(user)
             return Response(
                 {'Message': 'User Deleted',
                  'data': serialize.data
