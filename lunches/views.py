@@ -13,8 +13,7 @@ from rest_framework.authentication import SessionAuthentication  # Import the Se
 from rest_framework.permissions import AllowAny
 
 class CreateFreeLunchAPIView(APIView):
-    #
-    permission_classes = [AllowAny]
+    #permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         # Get data from the rest body
