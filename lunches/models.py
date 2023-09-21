@@ -1,6 +1,7 @@
+
 from django.db import models
-from django.conf import settings
 from users.models import User
+from organization.models import Organization
 
 class Lunch(models.Model):
     quantity = models.PositiveIntegerField(default=1)
@@ -17,6 +18,11 @@ class Lunch(models.Model):
         User,
         related_name="received_lunches",
         on_delete=models.CASCADE,
+    )
+    org_id = models.ForeignKey(
+        Organization,
+        related_name='organization',
+        on_delete=models.CASCADE
     )
     """
         The related name can be used to query the database
