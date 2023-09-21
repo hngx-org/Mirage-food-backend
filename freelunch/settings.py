@@ -85,10 +85,12 @@ WSGI_APPLICATION = "freelunch.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        # "ENGINE": "django.db.backends.mysql",
+        # "NAME": config("DB_NAME"),
+        # "USER": config("DB_USER"),
+        # "PASSWORD": config("DB_PASSWORD"),
     }
 }
 
@@ -147,17 +149,6 @@ cloudinary.config(
     api_key=config("CLOUDINARY_API_KEY"),
     api_secret=config("CLOUDINARY_API_SECRET"),
 )
-
-
-# MEDIA_URL = os.path.join(BASE_DIR, 'media/')
-
-# cloudinary config for profile picture upload
-# cloudinary.config(
-#     cloud_name = config('CLOUDINARY_CLOUD_NAME'),
-#     api_key = config('CLOUDINARY_API_KEY'),
-#     api_secret = config('CLOUDINARY_API_SECRET')
-# )
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
