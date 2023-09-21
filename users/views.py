@@ -21,7 +21,7 @@ class UserListViewSet(APIView):
             "data": serializer.data
         }, status=status.HTTP_200_OK)
 
-class DeleteUserView:
+class DeleteUserView(APIView):
 
     def get_user_by_pk(self, pk):
         try:
