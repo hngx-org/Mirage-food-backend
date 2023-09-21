@@ -163,9 +163,6 @@ cython_debug/
 #sensitive info
 .env
 
-<<<<<<< HEAD
-=======
 /virtual
 /lunches/migrations
->>>>>>> 61f328dee497fbcbfd352ac01075f5d666a17e4b
 virtual

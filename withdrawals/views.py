@@ -1,8 +1,4 @@
 from rest_framework import generics
-<<<<<<< HEAD
-from .models import Withdrawal
-from .serializers import WithdrawalSerializer
-=======
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -48,13 +44,8 @@ class LunchWithdrawalCreateView(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
->>>>>>> 61f328dee497fbcbfd352ac01075f5d666a17e4b
 
 class WithdrawalUpdateView(generics.RetrieveUpdateAPIView):
     queryset = Withdrawal.objects.all()
     serializer_class = WithdrawalSerializer
-<<<<<<< HEAD
-    lookup_field = 'pk'
-=======
     lookup_field = "pk"
->>>>>>> 61f328dee497fbcbfd352ac01075f5d666a17e4b
