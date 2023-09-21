@@ -31,7 +31,7 @@ class UserRetrieveUpdateSet(APIView):
 
     def put(self, request, pk, format=None):
         """
-        Updates user details
+        Update the user details with the below lines of codes
         """
         user = self.get_object(pk)
         serializer = UserListSerializer(user, data=request.data)
@@ -39,7 +39,7 @@ class UserRetrieveUpdateSet(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({
-                "message" : "successfully updated user",
+                "message" : "successfully updated user information",
                 "statusCode": status.HTTP_200_OK,
                 "data": serializer.data
             }, status=status.HTTP_200_OK)
