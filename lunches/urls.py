@@ -5,5 +5,5 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
 urlpatterns = [
-    path('api/lunch/send',CreateFreeLunchAPIView.as_view(), name="free_lunch"),
+    path('api/users/<int:sender_id>/organizations/<int:organization_id>/lunches', CreateFreeLunchAPIView.as_view(), name='free_lunch' )
 ]

@@ -138,13 +138,13 @@ SIMPLE_JWT = {
 
   # ...
 }
-=========
+#=========
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'users.backends.CustomBackend',
 ]
 
->>>>>>> dc1746b6069a3f236c31f239767ffea81a91b58b
+#>>>>>>> dc1746b6069a3f236c31f239767ffea81a91b58b
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
