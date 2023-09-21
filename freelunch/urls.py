@@ -9,5 +9,7 @@ router.register(r'invitations', InvitationViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('users/', include(router.urls)),
+
     # Add other URL patterns as needed
 ]

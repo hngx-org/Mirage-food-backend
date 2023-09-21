@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'lunches',
     'organization',
     'rest_framework',
-    'organization',
 ]
 
 MIDDLEWARE = [
@@ -85,8 +84,8 @@ WSGI_APPLICATION = 'freelunch.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
+    
     'default': {
-
         'ENGINE': 'django.db.backends.sqlite3',  # Or your preferred database engine
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
@@ -95,11 +94,6 @@ DATABASES = {
         'PORT': '',  # Empty for default
     }
 
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'free_lunch',
-        'USER': 'root',
-        'PASSWORD':'0layimika'
-        }
 
 }
 
