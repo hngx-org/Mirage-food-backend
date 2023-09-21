@@ -1,13 +1,5 @@
 from rest_framework.views import APIView
 from .models import User
-from rest_framework.response import Response
-from rest_framework import status
-
-from .serializers import UserListSerializer
-
-<<<<<<< HEAD
-=======
-# Create your views here.
 from rest_framework import generics, permissions
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -69,7 +61,6 @@ class DeleteUserView:
         user = self.get_user_by_pk(pk=id)
         user.delete()
         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
->>>>>>> 61f328dee497fbcbfd352ac01075f5d666a17e4b
 
 class UserListViewSet(APIView):
     def get(self, request, *args, **kwargs):
@@ -100,4 +91,3 @@ class DeleteUserView(APIView):
         user = self.get_user_by_pk(pk=id)
         user.delete()
         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
-

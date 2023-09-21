@@ -1,26 +1,19 @@
-<<<<<<< HEAD
 from rest_framework.views import APIView 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-=======
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from users.models import User
->>>>>>> 61f328dee497fbcbfd352ac01075f5d666a17e4b
 from .models import Lunch
 from .serializers import LunchSerializer
 import ast
 from organization.models import Organization, OrganizationLunchWallet
-from rest_framework.authentication import SessionAuthentication  # Import the SessionAuthentication class if you want to use it for a specific view
+from rest_framework.authentication import SessionAuthentication 
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import api_view
 from django.http import Http404
-<<<<<<< HEAD
+
 
 @api_view(['GET'])
 def user_lunch_list(request, id):
@@ -32,12 +25,7 @@ def user_lunch_list(request, id):
         raise Http404("Free lunch does not exist at the moment")
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-=======
-from .serializers import LunchSerializer
-from django.shortcuts import get_object_or_404
 
-
-# Create your views here.
 @api_view(['GET'])
 def get_a_lunch(request, id):
     """Returns an existing lunch by id"""
@@ -64,8 +52,6 @@ def get_a_lunch(request, id):
         }
     }, status=status.HTTP_201_CREATED)
 
-
-# Create your views here.
 
 class CreateFreeLunchAPIView(APIView):
     #permission_classes = [AllowAny]
@@ -114,7 +100,7 @@ class CreateFreeLunchAPIView(APIView):
                          "statusCode": 201,
                          "data": data})
     
->>>>>>> 61f328dee497fbcbfd352ac01075f5d666a17e4b
+
 
 @api_view(['DELETE'])
 def delete_free_lunch(request, id):

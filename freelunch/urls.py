@@ -26,9 +26,5 @@ urlpatterns = [
     path('api/', include('organization.urls')),
     path('api/', include('users.urls')),
     path('api/', include('lunches.urls')),
-<<<<<<< HEAD
-    path('api/',include('users.urls'))
-=======
-
->>>>>>> 61f328dee497fbcbfd352ac01075f5d666a17e4b
+    path('api/',include('users.urls')),
 ]
