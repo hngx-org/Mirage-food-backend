@@ -7,6 +7,9 @@ from .serializers import LunchSerializer
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 # Create your views here.
 
 @api_view(['DELETE'])
@@ -45,6 +48,10 @@ def update_free_lunch(request, id):
                     }, status=status.HTTP_201_CREATED)
                     
 class allFreeLunchesListView(APIView):
+    @swagger_auto_schema(
+            operation_summary="List all Lunches",
+            responses={status.HTTP_200_OK: openapi.Response("successfully fetched lunches", LunchSerializer(many=True))}
+    )
     def get(self, request):
         lunches = Lunch.objects.all()
         serializer = LunchSerializer(lunches, many=True)
@@ -52,14 +59,22 @@ class allFreeLunchesListView(APIView):
       
 
         response_data = {
-            "message": "Lunch request created successfully",
-            "statusCode": status.HTTP_201_CREATED,
+            "message": "successfully fetched lunches",
+            "statusCode": status.HTTP_200_OK,
             "data": finalData,
         }
 
         return Response(response_data)
 
 class LunchDetailView(APIView):
+    @swagger_auto_schema(
+            operation_summary="Get a user's Lunch",
+            responses={
+                status.HTTP_200_OK: openapi.Response("User details", LunchSerializer()),
+                status.HTTP_404_NOT_FOUND: "Detail not found",
+                status.HTTP_403_FORBIDDEN: "Permission denied",
+                }
+    )
     def get(self, request, user_id, lunch_id):
         lunch = get_object_or_404(Lunch, sender_id=user_id, id=lunch_id)
         serializer = LunchSerializer(lunch)

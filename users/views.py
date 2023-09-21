@@ -13,7 +13,7 @@ from .serializers import UserListSerializer
 class UserListViewSet(APIView):
     @swagger_auto_schema(
             operation_summary="List all users",
-            responses={200: openapi.Response("List of albums", UserListSerializer(many=True))}
+            responses={status.HTTP_200_OK: openapi.Response("List of users", UserListSerializer(many=True))}
     )
     def get(self, request, *args, **kwargs):
         """
@@ -30,16 +30,31 @@ class UserListViewSet(APIView):
 
 class DeleteUserView(APIView):
 
-    def get_user_by_pk(self, pk):
+    @swagger_auto_schema(
+            operation_summary="Get a user's details",
+            responses={
+                status.HTTP_200_OK: openapi.Response("User details", UserListSerializer()),
+                status.HTTP_404_NOT_FOUND: "User does not exist",
+                status.HTTP_403_FORBIDDEN: "Permission denied",
+                }
+    )
+    def get(self, pk):
         try:
-            return User.objects.get(pk=id)
+            return UserListSerializer(User.objects.get(pk=id)).data
         except:
             return Response({
                 'error': 'User does not exist'
             }, status=status.HTTP_404_NOT_FOUND)
 
-
-    def delete_user(self, request, pk):
+    @swagger_auto_schema(
+            operation_summary="Delete a user",
+            responses={
+                status.HTTP_204_NO_CONTENT: "User Deleted",
+                status.HTTP_404_NOT_FOUND: "User does not exist",
+                status.HTTP_403_FORBIDDEN: "Permission denied",
+                }
+    )
+    def delete(self, request, pk):
         user = self.get_user_by_pk(pk=id)
         user.delete()
         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
