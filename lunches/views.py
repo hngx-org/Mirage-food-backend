@@ -1,4 +1,3 @@
-
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,6 +10,11 @@ import ast
 from organization.models import Organization, OrganizationLunchWallet
 from rest_framework.authentication import SessionAuthentication  # Import the SessionAuthentication class if you want to use it for a specific view
 from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+
+# Create your views here.
 
 class CreateFreeLunchAPIView(APIView):
     #permission_classes = [AllowAny]
@@ -40,7 +44,6 @@ class CreateFreeLunchAPIView(APIView):
             if receiver_id==user_id:
                 continue
             else:
-    
                 try:
                     # Attempt to fetch the receiver instance based on the receiver_id
                     receiver = User.objects.get(id=int(receiver_id))
@@ -59,17 +62,7 @@ class CreateFreeLunchAPIView(APIView):
         return Response({"message": "Lunch request created successfully",
                          "statusCode": 201,
                          "data": data})
-
-from rest_framework.decorators import api_view
-from .models import Lunch
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-from .serializers import LunchSerializer
-from django.http import Http404
-from django.shortcuts import get_object_or_404
-
-# Create your views here.
+    
 
 @api_view(['DELETE'])
 def delete_free_lunch(id):
