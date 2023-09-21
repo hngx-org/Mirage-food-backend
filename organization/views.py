@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from .models import Organization, OrganizationLunchWallet
 
 def organization_balance(request, organization_id):
-    # Retrieve the organization or return a 404 response if it doesn't exist
+    
     organization = get_object_or_404(Organization, id=organization_id)
 
     # Query the OrganizationLunchWallet model to get the balance for this organization
