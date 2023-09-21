@@ -9,7 +9,23 @@ from .models import Organization
 
 
 # Create your views here.
-
+@api_view(['POST'])
+def post(request, *args, **kwargs):
+        serialize = OrganizationSerializer(data=request.data)
+        if serialize.is_valid():
+            serialize.save()
+            return Response({
+                'data': serialize.data,
+                'message': 'Successful'
+                }, status=status.HTTP_201_CREATED)
+        else:
+            default = serialize.errors
+            error = {}
+            for field_name, field_errors in default.items():
+                error[field_name] = field_errors[0]
+            return Response({
+                'message': 'Bad Request',
+                'error': error}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_organization(request, user_id, org_id):
