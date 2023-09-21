@@ -5,34 +5,55 @@ from rest_framework.views import APIView
 from .models import User
 from .serializers import UserListSerializer
 
-# Create your views here.
 
-class UserListViewSet(APIView):
-    def get(self, request, *args, **kwargs):
+# Beginning of the user update
+class UserRetrieveUpdateSet(APIView):
+    def get_object(self, id):
         """
-        Get user details
+        Gets a user object with the given pk
         """
-        queryset = User.objects.all()
-        serializer = UserListSerializer(queryset, many=True)
+        try:
+            return User.objects.get(id=id)
+        except User.DoesNotExist:
+            return None
+
+    def get(self, request,id=None, format=None):
+        """
+        Gets user details
+        """
+        user = self.get_object(id)
+        if user is None:
+            return Response({
+                "message": f"User with id {id} does not exist.",
+                "statusCode": status.HTTP_404_NOT_FOUND,
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserListSerializer(user)
 
         return Response({
-            "message" : "successfully fetched users",
+            "message": "Successfully fetched user",
             "statusCode": status.HTTP_200_OK,
             "data": serializer.data
         }, status=status.HTTP_200_OK)
 
-class DeleteUserView(APIView):
+class DeleteUserView:
 
-    def get_user_by_pk(self, pk):
+    def get_user_by_pk(self, id):
         try:
-            return User.objects.get(pk=id)
+            return User.objects.get(id=id)
         except:
             return Response({
-                'error': 'User does not exist'
+                "message": f"User with pk {id} does not exist.",
+                "statusCode": status.HTTP_404_NOT_FOUND,
             }, status=status.HTTP_404_NOT_FOUND)
 
+        serializer = UserListSerializer(user, data=request.data, partial=True)  # Use partial=True to enable partial updates
 
-    def delete_user(self, request, pk):
-        user = self.get_user_by_pk(pk=id)
-        user.delete()
-        return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "message": "Successfully partially updated user information",
+                "statusCode": status.HTTP_200_OK,
+                "data": serializer.data
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
