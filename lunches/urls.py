@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from . views import CreateFreeLunchAPIView, UpdateLunch
+from . views import CreateFreeLunchAPIView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
