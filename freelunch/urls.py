@@ -27,9 +27,9 @@ from drf_yasg import openapi
 # Schema view for DRF-YASG
 schema_view = get_schema_view(
     openapi.Info(
-        title="Music API",
+        title="Free Lunch API",
         default_version="v1",
-        description="A small API to display a bunch of music information",
+        description="An API to handle the backend of free-lunch application",
         # terms_of_service="https://www.yourapp.com/terms/",
         # contact=openapi.Contact(email="contact@yourapp.com"),
         # license=openapi.License(name="Your License"),
