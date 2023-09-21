@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from .models import OrganizationLunchWallet, Organization
 
-
 class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
     """
     Serializer for organization lunch model
