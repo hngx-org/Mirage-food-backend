@@ -5,8 +5,6 @@ from rest_framework.response import Response
 from rest_framework import status
 
 # Create your views here.
-
-
 @api_view(['GET'])
 def get_a_lunch(request, id):
     """Returns an existing lunch by id"""
@@ -32,3 +30,15 @@ def get_a_lunch(request, id):
             "id": lunch.id
         }
     }, status=status.HTTP_201_CREATED)
+from django.http import Http404
+
+# Create your views here.
+
+@api_view(['DELETE'])
+def delete_free_lunch(id):
+        try:
+                freelunch = Lunch.objects.get(id=id)
+                freelunch.delete()
+                return Response({'Message': 'Free Lunch Deleted'}, status=status.HTTP_200_OK)
+        except Lunch.DoesNotExist:
+                raise Http404("Free Lunch does not exist at the moment")
