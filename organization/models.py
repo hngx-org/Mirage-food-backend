@@ -29,3 +29,14 @@ class OrganizationLunchWallet(models.Model):
 
     def __str__(self):
         return f'{self.balance}'
+
+
+class OrganizationInvites(models.Model):
+    """Model for Organization Invites """
+    org_id = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    email = models.EmailField()
+    token = models.CharField(max_length=20, null=False)
+    TTL = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.email}'
