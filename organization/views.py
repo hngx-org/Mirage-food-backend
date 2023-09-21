@@ -12,10 +12,9 @@ from .models import Organization
 @api_view(['GET'])
 def get_user(request, user_id, org_id):
     try:
-        org = User.objects.get(org_id=org_id)
-        user = User.objects.get(pk=user_id)
-        if org.org_id and user.org_id == org_id:
-            serializer = OrganizationSerializer(organization)
+        users = User.objects.filter(org_id=org_id)
+        if users.id == user_id:
+            serializer = UserSerializer(users)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'User Not found in this Organisation'}, status=status.HTTP_404_NOT_FOUND)
