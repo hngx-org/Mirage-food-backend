@@ -114,7 +114,6 @@ Content-Type: application/json
 }
 ```
 
-
 ### Create an Organization
 
 ### Endpoint
@@ -266,4 +265,3 @@ HTTP/1.1  403 Forbidden
    "error": User not authorized to create an organization invite.",  
   }
 ```
-
