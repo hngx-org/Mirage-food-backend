@@ -1,4 +1,8 @@
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    BaseUserManager,
+)
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from cloudinary.models import CloudinaryField
@@ -8,13 +12,14 @@ from organization.models import Organization
 class UserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
-            raise ValueError(_('Users must have an email address'))
+            raise ValueError(_("Users must have an email address"))
         if password is None:
             raise ValueError(_("Password is compulsory"))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
-        user.save(using=self._db)
+        user.save(using=self.db)
+
         return user
 
     def create_superuser(self, email, password, **extra_fields):
@@ -59,7 +64,7 @@ class User(PermissionsMixin, AbstractBaseUser):
         'auth.Permission', verbose_name='user permissions', blank=True, related_name='custom_users_permissions')
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name"]
+    REQUIRED_FIELDS = ["first_name", "last_name"]
     objects = UserManager()
 
     class Meta:
@@ -67,4 +72,4 @@ class User(PermissionsMixin, AbstractBaseUser):
         verbose_name_plural = "Users"
 
     def __str__(self) -> str:
-        return f'{self.first_name} {self.last_name}'
+        return f"{self.first_name} {self.last_name}"
