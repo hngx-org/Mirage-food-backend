@@ -1,13 +1,11 @@
-<<<<<<< Updated upstream
-=======
-from django.shortcuts import render
->>>>>>> Stashed changes
 from rest_framework.decorators import api_view
 from .models import Lunch
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import status
-from django.http import Http404 
 from .serializers import LunchSerializer
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
@@ -32,36 +30,37 @@ def update_free_lunch(request, id):
                 serializer = LunchSerializer(freelunch, data=request.data, partial=True)
                 if serializer.is_valid():
                         serializer.save()
-                        return Response({"Lunch updated successfully": serializer.data}, status=status.HTTP_200_OK)
-<<<<<<< Updated upstream
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({
+                        "message": "Lunch request created successfully",
+                        "statusCode": 201,
+                        "data": {
+                            "receiverId": Lunch.receiver_id,
+                            "senderId": Lunch.sender_id_id,
+                            "quantity": Lunch.quantity,
+                            "redeemed": Lunch.redeemed,
+                            "note": Lunch.note,
+                            "created_at": Lunch.created_at,
+                            "id": Lunch.id
+                        }
+                    }, status=status.HTTP_201_CREATED)
+                    
+class allFreeLunchesListView(APIView):
+    def get(self, request):
+        lunches = Lunch.objects.all()
+        serializer = LunchSerializer(lunches, many=True)
+        finalData = serializer.data
+      
 
-# Create your views here.
-@api_view(['GET'])
-def get_a_lunch(request, id):
-    """Returns an existing lunch by id"""
-
-    try:
-        lunch = Lunch.objects.get(id=id)
-    except Lunch.DoesNotExist:
-        return Response(
-            {"error": "Lunch not found"},
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-    return Response({
-        "message": "Lunch request created successfully",
-        "statusCode": 201,
-        "data": {
-            "receiverId": lunch.receiver_id,
-            "senderId": lunch.sender_id_id,
-            "quantity": lunch.quantity,
-            "redeemed": lunch.redeemed,
-            "note": lunch.note,
-            "created_at": lunch.created_at,
-            "id": lunch.id
+        response_data = {
+            "message": "Lunch request created successfully",
+            "statusCode": status.HTTP_201_CREATED,
+            "data": finalData,
         }
-    }, status=status.HTTP_201_CREATED)
-=======
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
->>>>>>> Stashed changes
+
+        return Response(response_data)
+
+class LunchDetailView(APIView):
+    def get(self, request, user_id, lunch_id):
+        lunch = get_object_or_404(Lunch, sender_id=user_id, id=lunch_id)
+        serializer = LunchSerializer(lunch)
+        return Response(serializer.data)

@@ -36,7 +36,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-<<<<<<< Updated upstream
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -48,20 +47,6 @@ INSTALLED_APPS = [
     "lunches",
     "organization",
     "rest_framework",
-=======
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'users',
-    'withdrawals',
-    'lunches',
-    'organization',
-    'rest_framework',
-    'organization'
->>>>>>> Stashed changes
 ]
 
 MIDDLEWARE = [
@@ -167,11 +152,11 @@ cloudinary.config(
 # MEDIA_URL = os.path.join(BASE_DIR, 'media/')
 
 # cloudinary config for profile picture upload
-cloudinary.config(
-    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
-    api_key = config('CLOUDINARY_API_KEY'),
-    api_secret = config('CLOUDINARY_API_SECRET')
-)
+# cloudinary.config(
+#     cloud_name = config('CLOUDINARY_CLOUD_NAME'),
+#     api_key = config('CLOUDINARY_API_KEY'),
+#     api_secret = config('CLOUDINARY_API_SECRET')
+# )
 
 
 # MEDIA_URL = os.path.join(BASE_DIR, 'media/')

@@ -15,10 +15,6 @@ class Organization(models.Model):
     class Meta:
         verbose_name_plural = 'Organizations'
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 class OrganizationLunchWallet(models.Model):
   """Model for Organization Lunch Wallet"""
   balance = models.DecimalField(max_digits=10,decimal_places=2,validators=[MinValueValidator(0)])
@@ -30,7 +26,6 @@ class OrganizationLunchWallet(models.Model):
       return f'{self.balance}'
 
 
-<<<<<<< Updated upstream
 class OrganizationInvites(models.Model):
     """Model for Organization Invites """
     org_id = models.ForeignKey(Organization, on_delete=models.CASCADE)
@@ -40,7 +35,3 @@ class OrganizationInvites(models.Model):
 
     def __str__(self):
       return f'{self.email}'
-=======
-
-
->>>>>>> Stashed changes
