@@ -3,9 +3,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
-
 from .serializers import UserListSerializer
 
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import User
+from .serializers import UserListSerializer
+
+# Beginning of the user update
 class UserRetrieveUpdateSet(APIView):
     def get_object(self, pk):
         """
@@ -20,18 +27,24 @@ class UserRetrieveUpdateSet(APIView):
         """
         Gets user details
         """
-        user = User.get_object(pk)
-        serializer = UserListSerializer(user, many=True)
+        user = self.get_object(pk)
+        if user is None:
+            return Response({
+                "message": f"User with pk {pk} does not exist.",
+                "statusCode": status.HTTP_404_NOT_FOUND,
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserListSerializer(user)
 
         return Response({
-            "message" : "successfully fetched users",
+            "message": "Successfully fetched user",
             "statusCode": status.HTTP_200_OK,
             "data": serializer.data
         }, status=status.HTTP_200_OK)
 
     def put(self, request, pk, format=None):
         """
-        Update the user details with the below lines of codes
+        Update the user details
         """
         user = self.get_object(pk)
         serializer = UserListSerializer(user, data=request.data)
@@ -39,12 +52,12 @@ class UserRetrieveUpdateSet(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({
-                "message" : "successfully updated user information",
+                "message": "Successfully updated user information",
                 "statusCode": status.HTTP_200_OK,
                 "data": serializer.data
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 # Check the comment at the last line of this file.
 
@@ -76,3 +89,23 @@ class UserRetrieveUpdateSet(APIView):
 #             return Response({"status": False, "message": "Invalid data provided."}, status=status.HTTP_400_BAD_REQUEST)
 
 # I commented it because I am not sure if we need it or not. And I think we can make do with the above code. PATCH is not part of our task
+# Beginning of the user delete
+class DeleteUserView(APIView):
+
+    def get_user_by_pk(self, pk):
+        try:
+            return User.objects.get(pk=pk)  # Corrected "id" to "pk"
+        except User.DoesNotExist:
+            return Response({
+                'error': 'User does not exist'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, pk, format=None):
+        user = self.get_user_by_pk(pk)
+        if user:
+            user.delete()
+            return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({
+                'error': 'User does not exist'
+            }, status=status.HTTP_404_NOT_FOUND)
