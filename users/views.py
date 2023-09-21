@@ -9,6 +9,10 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate, login
 
 
+from .serializers import SearchedUserSerializer
+from django.http import Http404
+
+# Create your views here.
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
     # Get username and password from the request
@@ -61,4 +65,28 @@ class UserListViewSet(APIView):
             "data": serializer.data
         }, status=status.HTTP_200_OK)
 
+
+class SearchUserView(APIView):
+    "Api view accepting either a name (first or last) or email parameter to search for a user"
+
+    def get_object(self, param:str):
+        try:
+            return User.objects.get(first_name=param)
+        except User.DoesNotExist:
+            try:
+                return User.objects.get(last_name=param)
+            except User.DoesNotExist:
+                try:
+                    return User.objects.get(email=param)
+                except User.DoesNotExist:
+                    raise Http404
+
+    def get(self, request, name_or_email:str, *args, **kwargs):
+        instance = self.get_object(name_or_email)
+        serializer = SearchedUserSerializer(instance)
+        return Response({
+            'message': 'User Found',
+            'statusCode': status.HTTP_200_OK,
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
 
