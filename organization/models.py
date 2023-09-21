@@ -14,6 +14,7 @@ class Organization(models.Model):
     
     class Meta:
         verbose_name_plural = 'Organizations'
+        db_table = 'org'
 
 class OrganizationLunchWallet(models.Model):
   """Model for Organization Lunch Wallet"""

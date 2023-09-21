@@ -32,4 +32,5 @@ class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
     def get_queryset(self):
         return Organization.objects.all()
 
+
     ...

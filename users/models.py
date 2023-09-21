@@ -56,6 +56,7 @@ class User(PermissionsMixin, AbstractBaseUser):
     class Meta:
         verbose_name = "User"
         verbose_name_plural = "Users"
+        db_table = 'use'
 
     def __str__(self) -> str:
         return f'{self.first_name} {self.last_name}'

@@ -5,25 +5,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-class UserView(APIView):
-    def get(self, request, pk, *args, **kwargs):
+class OrgUserView(APIView):
+    def get(self, request, org_id, user_id, *args, **kwargs):
         """
-        Get a particular user from user_id, name or email
+        Get a particular user from user_id and org_id
         """
-        if pk.isdigit():
-            user = get_object_or_404(User, id=pk)
-            serializer = UserSerializer(user)
-        else:
-            try:
-                user = get_list_or_404(User, first_name=pk)
-                serializer = UserSerializer(user, many=True)
-            except:
-                try:
-                    user = get_object_or_404(User, email=pk)
-                    serializer = UserSerializer(user)
-                except:
-                    user = get_list_or_404(User, last_name=pk)
-                    serializer = UserSerializer(user, many=True)
+        users = get_list_or_404(User, id=user_id, org_id=org_id)
+        serializer = UserSerializer(users, many=True)
         return Response({
             "message": "User found",
             "data": serializer.data
