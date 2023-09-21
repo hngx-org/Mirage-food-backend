@@ -3,5 +3,5 @@ from .views import UserRetrieveUpdateSet
 
 urlpatterns = [
 
-path('users/<int:pk>/', UserRetrieveUpdateSet.as_view(), name='user-retrieve-update-set'),
+path('users/<int:id>/', UserRetrieveUpdateSet.as_view(), name='user-retrieve-update-set'),
 ]

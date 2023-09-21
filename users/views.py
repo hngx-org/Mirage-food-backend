@@ -8,23 +8,23 @@ from .serializers import UserListSerializer
 
 # Beginning of the user update
 class UserRetrieveUpdateSet(APIView):
-    def get_object(self, pk):
+    def get_object(self, id):
         """
         Gets a user object with the given pk
         """
         try:
-            return User.objects.get(pk=pk)
+            return User.objects.get(id=id)
         except User.DoesNotExist:
             return None
 
-    def get(self, request,pk=None, format=None):
+    def get(self, request,id=None, format=None):
         """
         Gets user details
         """
-        user = self.get_object(pk)
+        user = self.get_object(id)
         if user is None:
             return Response({
-                "message": f"User with pk {pk} does not exist.",
+                "message": f"User with id {id} does not exist.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
             }, status=status.HTTP_404_NOT_FOUND)
 
@@ -36,11 +36,11 @@ class UserRetrieveUpdateSet(APIView):
             "data": serializer.data
         }, status=status.HTTP_200_OK)
 
-    def put(self, request, pk, format=None):
+    def put(self, request, id, format=None):
         """
         Update the user details
         """
-        user = self.get_object(pk)
+        user = self.get_object(id)
         serializer = UserListSerializer(user, data=request.data)
 
         if serializer.is_valid():
@@ -59,15 +59,15 @@ class UserRetrieveUpdateSet(APIView):
     That it make it possible to partially update the user details
     '''
 
-    def patch(self, request, pk, format=None):
+    def patch(self, request, id, format=None):
         """
         Partially update user details
         """
-        user = self.get_object(pk)
+        user = self.get_object(id)
 
         if user is None:
             return Response({
-                "message": f"User with pk {pk} does not exist.",
+                "message": f"User with pk {id} does not exist.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
             }, status=status.HTTP_404_NOT_FOUND)
 
