@@ -1,8 +1,7 @@
-from django.urls import path, re_path, include
-
-from .views import UserListViewSet
+from django.urls import path
+from .views import UserRetrieveUpdateSet
 
 urlpatterns = [
-    # URL pattern for GET all users should be here
-    path('users/<int:pk>', UserListViewSet.as_view(), name='users-list'),
+# path('users/', UserListViewSet.as_view(), name='user-list'),
+path('users/<int:pk>/', UserRetrieveUpdateSet.as_view(), name='user-retrieve-update-set'),
 ]

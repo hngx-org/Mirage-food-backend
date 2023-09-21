@@ -1,8 +1,8 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from cloudinary.models import CloudinaryField
-from organization.models import Organization
+# from cloudinary.models import CloudinaryField  <...uncomment this imporatation when neccessary...>
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
@@ -31,11 +31,11 @@ class UserManager(BaseUserManager):
 class User(PermissionsMixin, AbstractBaseUser):
     # by default django uses auto increament for the id
     # uncomment org_id when organization model has been created
-    org_id = models.ForeignKey(Organization, verbose_name=_("organization name"), on_delete=models.CASCADE, null=True)
+    # org_id = models.ForeignKey(Organization,verbose_name=_("organization name"), on_delete=models.CASCADE, null=True)
     first_name = models.CharField(_("first name"), max_length=225)
     last_name = models.CharField(_("last name"), max_length=225, blank=True, null=True)
-    profile_pic = CloudinaryField(_("profile pic"))
-    email = models.EmailField(_("email address"), max_length=225,unique=True)
+    # profile_pic = CloudinaryField(_("profile pic", null=True))   ...uncomment the profile_pic when connected to the remote database...
+    email = models.EmailField(_("email address"), max_length=225,unique=True, null=True)
     phone = models.CharField(_("phone number"), max_length=20, null=True, blank=True)
     refresh_token = models.TextField(_("refresh token"), blank=True, null=True)
     bank_number = models.CharField(_("bank number"), max_length=50, blank=True, null=True)
@@ -43,7 +43,7 @@ class User(PermissionsMixin, AbstractBaseUser):
     bank_name = models.CharField(_("bank name"), max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(_("created date"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated date"), auto_now=True)
-    lunch_credit_balance = models.CharField(_("lunch credit"), max_length=50)
+    lunch_credit_balance = models.CharField(_("lunch credit"), max_length=50, null=True)
     is_active = models.BooleanField(default=True)  # Add is_active field
     is_staff = models.BooleanField(default=False) 
     groups = models.ManyToManyField('auth.Group',verbose_name='groups',blank=True,related_name='custom_users_groups')
@@ -59,3 +59,4 @@ class User(PermissionsMixin, AbstractBaseUser):
 
     def __str__(self) -> str:
         return f'{self.first_name} {self.last_name}'
+    
