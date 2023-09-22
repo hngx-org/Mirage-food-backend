@@ -1,5 +1,7 @@
 from .models import  Invitation
 from rest_framework import serializers
+from .models import OrganizationLunchWallet
+
 
 
 
@@ -17,9 +19,13 @@ class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = OrganizationLunchWallet
+
  # Corrected the field name
 
         fields = ['balance', 'orgnization']
+
+        fields = ['balance', 'org_id']
+
 
 
 class ListInvitesSerializer(serializers.ModelSerializer):

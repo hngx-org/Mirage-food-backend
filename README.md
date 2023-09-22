@@ -32,18 +32,29 @@ NOTE: All Pull requests should be made toward the development branch.
  ```bash
  touch .env
 ```
-  Ensure that this file is hidden inside the gitignore
-  
-Sample dotenv file will have the following structure:
+
+## Setting Up Cloudinary Credentials
+
+- Sign Up for Cloudinary, If you haven't already
+
+- After logging in, you'll be redirected to your Cloudinary dashboard.
+Retrieve Your API Credentials for Python:
+
+## Configure your project secrets and credentials in this file
+
+### Sample dotenv file will have the following structure:
+
  ```bash
- SECRET_KEY='secret'
- DB_NAME='mydb'
- DB_USER='user'
- DB_PASSWORD='pass123'
+ SECRET_KEY='REPLACE_ANY_SECRET_kEY'
+ DB_NAME='REPLACE_DATABASE_NAME'
+ DB_USER='REPLACE_DATABASE_USERNAME'
+ DB_PASSWORD='REPLACE DATABASE_PASSWORD'
+ CLOUDINARY_CLOUD_NAME='REPLACE_ME'
+ CLOUDINARY_API_KEY='REPLACE_ME'
+ CLOUDINARY_API_SECRET='REPLACE_ME'
  ```
+**Ensure that this file is hidden inside the gitignore**
 
-
-Configure your project secrets and credentials in this file
 
 ## Install Dependencies 
  ```bash
@@ -54,9 +65,8 @@ or
  python3 -m pip install -r requirements.txt
 ```
 
-## Setup Database 
-  SetUp your Database and add the Db name, password and user to your dotenv file 
-  Now Migrate
+## Configuring your database, apply the database migrations using the following command:
+
  ```bash
  python3 manage.py migrate
 ```
@@ -80,5 +90,7 @@ Ensure to follow these steps when committing:
 2. Open a new Pull Request to the Development Branch and not the Main Branch.
 
 ## Technology used 
-* [Python 3.10.12](https://www.python.org/)
-* [Django == 4.2.4](https://docs.djangoproject.com/en/4.2/)
+- [Python 3.10.12](https://www.python.org/)
+- [Django == 4.2.4](https://docs.djangoproject.com/en/4.2/)
+- [Cloudinary](https://cloudinary.com/)
+- [MySQL](https://www.mysql.com/)
