@@ -103,7 +103,7 @@ class SearchUserView(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
-class UpdateUserBankDetailsView(mixins.UpdateModelMixin):
+class UpdateUserBankDetailsView(mixins.UpdateModelMixin, generics.GenericAPIView):
     permission_classes = [isOwner, IsAdmin]
     queryset = User.objects.all()
     serializer_class = UserBankDetailsSerializer
@@ -118,12 +118,13 @@ class UpdateUserBankDetailsView(mixins.UpdateModelMixin):
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        response = super().partial_update(request, *args, **kwargs)
         message = 'User bank details updated successfully.'
         return Response(
             {
                 'message': message,
                 'statusCode': status.HTTP_200_OK,
-                'data': serializer.data,
+                'data': response.data,
             },
             status=status.HTTP_200_OK,
         )
