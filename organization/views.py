@@ -39,12 +39,13 @@ from rest_framework.decorators import api_view
 
 
 class OrganizationView(APIView):
- 
-
-
-    permission_classes = [
-        IsAdmin,
-    ]
+    permission_classes = [ IsAdmin,]
+    @swagger_auto_schema(
+           
+            operation_summary="Allows an admin to create an organization",
+            request_body=OrganizationSerializer,
+            responses={201: 'Created', 400: 'Bad Request'},
+        )
 
     def post(self, request):
         request.data["lunch_price"] = request.data.get("lunch_price", 1000)
@@ -53,29 +54,36 @@ class OrganizationView(APIView):
         workers.Organization.create_organization(**serializer.validated_data)
         return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
     
+class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
+ 
+    
+    """Base view for organization update (put | patch)"""  # can be modified when adding other methods
 
+    serializer_class = OrganizationSerializer
+
+    @swagger_auto_schema(
+        operation_summary="Get all organizations",
+        operation_description=  "This endpoint allows the user to update the details of an organization by retrieving an organization using the organization id - To create a new instance a send POST request with the required data",
+
+
+        responses={
+            status.HTTP_200_OK: openapi.Response("Organization details", OrganizationSerializer(many=True)),
+            }
+    )
+    def get_queryset(self):
+        return Organization.objects.all()
 
 
 class OrganizationLunchWalletView(APIView):
-    """
-    Create an organization lunch wallet
-
-    
-      - To create a new instance a send POST request with the required data
-        ```
-        Example POST request data:
-        {
-            "name": "oranisation id",
-            "lunch price": "enter amount 2dp",
-            "currency"
-        }
-        ```
-    """
+   
+    permission_classes = [OrganisationAdmin]
     @swagger_auto_schema(
+        method="post",
         operation_summary="Create organization wallet",
         request_body=OrganizationSerializer,
         responses={201: 'Created', 400: 'Bad Request'},
     )
+    @api_view(['POST'])
     def post(self, request):
         serializer = OrganizationLunchWalletSerializer(data=request.data)
 
@@ -103,6 +111,12 @@ class ListInvitesView(APIView):
         return Response(ListInvitesSerializer(invites).data)
 
 @api_view(['GET'])
+@swagger_auto_schema(
+        operation_summary="List Organization Invitations",
+        operation_description=  "If user is an admin this lists all the invites in their Organisation",
+        responses={status.HTTP_200_OK: openapi.Response("successful", ListInvitesSerializer)},
+    )
+
 def organization_balance(request, organization_id):
     
     organization = get_object_or_404(Organization, id=organization_id)
@@ -126,9 +140,9 @@ class UserOrganizationAPI(APIView):
     @swagger_auto_schema(
                 operation_summary="Get a user's organization",
                 operation_description= "Use this endpoint to retrieve the organization associated with a specific user. It takes two parameters , org_id to identify the organisation and user_id to identify the user.The org_id must be associated with the user_id in order to get the organization. Invalid parameters will result to errors.",
-                parameters= "user_id and org_id,",
+          
                 responses={
-                    status.HTTP_200_OK: openapi.Response("User details", OrganizationSerializer()),
+                    status.HTTP_200_OK: openapi.Response("User details", OrganizationSerializer(many=True)),
                     status.HTTP_404_NOT_FOUND: "Organization not found for this user",
                     status.HTTP_403_FORBIDDEN: "Permission denied",
                     }
@@ -145,38 +159,26 @@ class UserOrganizationAPI(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
-    """
-    This endpoint allows the user to update the details of an organization by retrieving an organization using the organization id.
-     - To create a new instance a send POST request with the required data,
-    ```
-            Example POST request data:
-            {
-                "name": "oranisation id",
-                "lunch price": "enter amount 2dp",
-                "currency"
-            }
-    ```
-    """
-    
-    """Base view for organization update (put | patch)"""  # can be modified when adding other methods
-
-    serializer_class = OrganizationSerializer
-
-    @swagger_auto_schema(
-        operation_summary="Get all organizations",
-        operation_description=  "This endpoint allows the user to update the details of an organization by retrieving an organization using the organization id - To create a new instance a send POST request with the required data",
-
-
-        responses={
-            status.HTTP_200_OK: openapi.Response("Organization details", OrganizationSerializer(many=True)),
-            }
-)
     def get_queryset(self):
         return Organization.objects.all()
       
 class DeleteOrganizationView(APIView):
+    """this endpoint allows an admin user to delete a user"""
     permission_classes = [IsAdmin]
+    @swagger_auto_schema(
+        operation_summary="Delete a user",
+        operation_description=  "This endpoint allows an admin  to delete a user. It takes in the org_id",
+
+
+        responses={
+            status.HTTP_200_OK: openapi.Response("Organization details", OrganizationSerializer(many=True)),
+            status.HTTP_404_NOT_FOUND: "Organization not found for this user",
+            status.HTTP_403_FORBIDDEN: "Permission denied",
+                            
+            }
+    )
+
+
     def delete(request, org_id):
         organization = Organization.object.get(pk=org_id)
         if request.user in organization.user_set.all():
@@ -189,35 +191,21 @@ class DeleteOrganizationView(APIView):
 #organizationwalletupdate changes
 
 class OrganizationWalletUpdateView(generics.UpdateAPIView,):
-    """
-    This endpoint allows an admin user to update the organization wallet
-    The requested org_id must match the requested org_id inorder to update the wallet
-       ```
-        Example POST request data:
-        {
-            "org_id": "integer",
-            "balance": "enter amount 2dp",
-           
-        }
-        ```
 
-    """
-   
-
-    #authentication_classes = [authentication.TokenAuthentication]
+    authentication_classes = [authentication.TokenAuthentication]
     queryset=OrganizationLunchWallet.objects.all()
     serializer_class = OrganizationLunchWalletSerializer
     permission_classes=[OrganisationAdmin]
 
     @swagger_auto_schema(
-                        operation_summary="Update the organization wallet i.e balance by admin",
-                        responses={
-                            status.HTTP_200_OK: openapi.Response("User details", OrganizationLunchWalletSerializer()),
-                            status.HTTP_404_NOT_FOUND: "Organization not found for this user",
-                            status.HTTP_403_FORBIDDEN: "Permission denied",
-                            }
-                )
-
+        operation_summary="Update the organization wallet",
+        operation_description="This endpoint allows an admin to update organization's lunch wallet",
+        responses={
+            status.HTTP_200_OK: openapi.Response("User details", OrganizationLunchWalletSerializer()),
+            status.HTTP_404_NOT_FOUND: "Organization not found for this user",
+            status.HTTP_403_FORBIDDEN: "Permission denied",
+            }
+    )
 
     
     def get_object(self):
