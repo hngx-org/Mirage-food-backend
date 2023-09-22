@@ -5,3 +5,4 @@ from .models import Organization, OrganizationInvites, OrganizationLunchWallet
 admin.site.register(Organization)
 admin.site.register(OrganizationLunchWallet)
 admin.site.register(OrganizationInvites)
+
