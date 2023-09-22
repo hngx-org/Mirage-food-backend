@@ -82,8 +82,8 @@ class TestGetOrganizationBalance(APITestCase):
             bank_name="your_bank_name",
             lunch_credit_balance="100.00",
           )
-    # user.is_staff = True
-    # user.is_superuser = True
+    user.is_staff = True
+    user.is_superuser = True
     user.save()
     self.client.login(email="user@gmail.com", password="password")
     
@@ -101,14 +101,59 @@ class TestGetOrganizationBalance(APITestCase):
           org_id=self.organization)
     
     self.url = f"/api/get_balance/{self.organization.id}/"
-    print(self.url)
     
-    
-  def test_create_organization_lunch_wallet(self):
+  def test_get_wallet_balance_returns_200(self):
     response = self.client.get(self.url)
     data = response.json()
-    print(data)
-    
     self.assertEqual(response.status_code, status.HTTP_200_OK)
     self.assertEqual(Decimal(data['organization_balance']), self.org_balance)
+
+
+class TestPostOrganizationLunchWallet(APITestCase):
+  """Test for creating Organization Launch Wallet"""
+  def setUp(self):
+    self.client = APIClient()
+    # setup an admin user
+    user = User.objects.create_user(
+            email="testuser@example.com",
+            password="password",
+            first_name="John",
+            last_name="Doe",
+            profile_pic="cloudinary_url",
+            phone="1234567890",
+            refresh_token="your_refresh_token",
+            bank_number="your_bank_number",
+            bank_code="your_bank_code",
+            bank_name="your_bank_name",
+            lunch_credit_balance="100.00",
+          )
+    user.is_staff = True
+    user.is_superuser = True
+    user.save()
+    self.client.login(email="user@gmail.com", password="password")
+    
+    # setup an organization
+    self.organization = Organization.objects.create(
+      name="Mirage",
+      lunch_price=Decimal("10.00"),
+      currency="NAI",
+    )
+    self.url = "/api/create/"
+    
+  def test_create_wallet_with_correct_data_retuns_400(self):
+    self.org_balance = Decimal('100.00')
+    self.lunch_wallet = OrganizationLunchWallet.objects.create(
+          balance=self.org_balance,
+          org_id=self.organization)
+    
+    self.lunch_wallet.save();
+    
+    response = self.client.post(self.url)
+    self.assertIsNotNone(self.lunch_wallet)
+    self.assertEqual(self.lunch_wallet.balance, self.org_balance)
+    self.assertEqual(self.lunch_wallet.org_id, self.organization)
+    self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    
+
+    
     
