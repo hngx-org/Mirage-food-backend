@@ -149,11 +149,11 @@ STATIC_URL = "static/"
 
 # cloudinary config for profile picture upload
 
-cloudinary.config(
-    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
-    api_key = config('CLOUDINARY_API_KEY'),
-    api_secret = config('CLOUDINARY_API_SECRET')
-)
+# cloudinary.config(
+#     cloud_name = config('CLOUDINARY_CLOUD_NAME'),
+#     api_key = config('CLOUDINARY_API_KEY'),
+#     api_secret = config('CLOUDINARY_API_SECRET')
+# )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

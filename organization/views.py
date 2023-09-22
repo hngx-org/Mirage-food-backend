@@ -24,7 +24,14 @@ from .serializers import OrganizationLunchWalletSerializer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
+from rest_framework.decorators import api_view
+
 class OrganizationLunchWalletView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Create organization wallet",
+        request_body=OrganizationLunchWalletSerializer,
+        responses={201: 'Created', 400: 'Bad Request'},
+    )
     def post(self, request):
         serializer = OrganizationLunchWalletSerializer(data=request.data)
 
@@ -43,11 +50,16 @@ class ListInvitesView(APIView):
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [OrganisationAdmin]
 
+    @swagger_auto_schema(
+        operation_summary="List Organization Invitations",
+        responses={status.HTTP_200_OK: openapi.Response("successful", ListInvitesSerializer)},
+    )
     def get(self, request):
         user = request.user
         invites = OrganizationInvites.objects.filter(org_id=user.org_id)
         return Response(ListInvitesSerializer(invites).data)
 
+@api_view(['GET'])
 def organization_balance(request, organization_id):
     
     organization = get_object_or_404(Organization, id=organization_id)
@@ -89,6 +101,12 @@ class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
 
     serializer_class = OrganizationSerializer
 
+    @swagger_auto_schema(
+                operation_summary="Get all organizations",
+                responses={
+                    status.HTTP_200_OK: openapi.Response("Organization details", OrganizationSerializer(many=True)),
+                    }
+        )
     def get_queryset(self):
         return Organization.objects.all()
 
