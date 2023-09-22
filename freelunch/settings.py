@@ -30,7 +30,7 @@ SECRET_KEY = "yvwe8y7pgdbc8ue78778282638838"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -106,17 +106,6 @@ DATABASES = {
 #     }
 # }
 
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.environ['RDS_DB_NAME'],
-#         'USER': os.environ['RDS_USERNAME'],
-#         'PASSWORD': os.environ['RDS_PASSWORD'],
-#         'HOST': os.environ['RDS_HOSTNAME'],
-#         'PORT': os.environ['RDS_PORT'],
-#     }
-# }
 
 # pagination
 REST_FRAMEWORK = {
