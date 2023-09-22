@@ -12,6 +12,7 @@ from .serializers import OrganizationSerializer
 from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
 
+
 from .models import Organization
 
 from django.shortcuts import render
@@ -19,6 +20,15 @@ from rest_framework.views import APIView
 from .serializers import OrganizationLunchWalletSerializer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+
+#organizationwalletupdate changes
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.http import JsonResponse
+from rest_framework import generics, status
+from .serializers import OrganizationLunchWalletUpdateSerializer
+
+
 
 class OrganizationLunchWalletView(APIView):
     def post(self, request):
@@ -80,5 +90,25 @@ class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
     def get_queryset(self):
         return Organization.objects.all()
 
-    ...
+
+
+class OrganizationWalletUpdateView(generics.RetrieveUpdateAPIView,):
+    #authentication_classes = [authentication.TokenAuthentication]
+    queryset=OrganizationLunchWallet.objects.all()
+    serializer_class = OrganizationLunchWalletSerializer
+    permission_classes=[OrganisationAdmin]
+    
+    def get_object(self):
+        """get the org-id asssociated with a user"""
+        org_id=self.request.user.org_id
+        try:
+            return  OrganizationLunchWallet.objects.get(org_id=org_id)
+
+        except: OrganizationLunchWallet.DoesNotExist
+
+    def update(self,request,*args,**kwargs):
+        if not request.user.is_staff:
+        
+            return Response({"error":"You do not have permission to change the balance"})
+        return super().update(request,*args,**kwargs)  
 

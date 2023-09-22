@@ -11,7 +11,7 @@ class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = OrganizationLunchWallet
-        fields = ['balance', 'org_id']
+        fields = ['org_id','balance']
 
 
 class ListInvitesSerializer(serializers.ModelSerializer):
@@ -28,3 +28,12 @@ class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
         fields = ["name", "lunch_price", "currency"]
+
+#organizationwalletupdate changes
+class OrganizationLunchWalletUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for organization lunch wallet model
+    """
+    class Meta:
+        model = OrganizationLunchWallet
+        fields = ['balance']
