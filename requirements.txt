@@ -10,6 +10,7 @@ djangorestframework-simplejwt
 mysqlclient
 Pillow
 PyJWT
+gunicorn
 python-decouple
 python-dotenv
 python-slugify
