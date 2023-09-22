@@ -34,10 +34,14 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from rest_framework import generics, status
 from .serializers import OrganizationLunchWalletUpdateSerializer
+from rest_framework.decorators import api_view
 
 
 
 class OrganizationView(APIView):
+ 
+
+
     permission_classes = [
         IsAdmin,
     ]
@@ -50,13 +54,26 @@ class OrganizationView(APIView):
         return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
     
 
-from rest_framework.decorators import api_view
 
 
 class OrganizationLunchWalletView(APIView):
+    """
+    Create an organization lunch wallet
+
+    
+      - To create a new instance a send POST request with the required data
+        ```
+        Example POST request data:
+        {
+            "name": "oranisation id",
+            "lunch price": "enter amount 2dp",
+            "currency"
+        }
+        ```
+    """
     @swagger_auto_schema(
         operation_summary="Create organization wallet",
-        request_body=OrganizationLunchWalletSerializer,
+        request_body=OrganizationSerializer,
         responses={201: 'Created', 400: 'Bad Request'},
     )
     def post(self, request):
@@ -71,14 +88,13 @@ class OrganizationLunchWalletView(APIView):
 
 
 class ListInvitesView(APIView):
-    """
-    If user is an admin this lists all the invites in their Organisation
-    """
+    
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [OrganisationAdmin]
 
     @swagger_auto_schema(
         operation_summary="List Organization Invitations",
+        operation_description=  "If user is an admin this lists all the invites in their Organisation",
         responses={status.HTTP_200_OK: openapi.Response("successful", ListInvitesSerializer)},
     )
     def get(self, request):
@@ -103,8 +119,14 @@ def organization_balance(request, organization_id):
 
 
 class UserOrganizationAPI(APIView):
+    
+    #Use this endpoint to retrieve the organization associated with a specific user. It takes two parameters , org_id to identify the organisation and user_id to identify the user.The org_id must be associated with the user_id in order to get the organization. Invalid parameters will result to errors.
+
+
     @swagger_auto_schema(
                 operation_summary="Get a user's organization",
+                operation_description= "Use this endpoint to retrieve the organization associated with a specific user. It takes two parameters , org_id to identify the organisation and user_id to identify the user.The org_id must be associated with the user_id in order to get the organization. Invalid parameters will result to errors.",
+                parameters= "user_id and org_id,",
                 responses={
                     status.HTTP_200_OK: openapi.Response("User details", OrganizationSerializer()),
                     status.HTTP_404_NOT_FOUND: "Organization not found for this user",
@@ -124,16 +146,32 @@ class UserOrganizationAPI(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
+    """
+    This endpoint allows the user to update the details of an organization by retrieving an organization using the organization id.
+     - To create a new instance a send POST request with the required data,
+    ```
+            Example POST request data:
+            {
+                "name": "oranisation id",
+                "lunch price": "enter amount 2dp",
+                "currency"
+            }
+    ```
+    """
+    
     """Base view for organization update (put | patch)"""  # can be modified when adding other methods
 
     serializer_class = OrganizationSerializer
 
     @swagger_auto_schema(
-                operation_summary="Get all organizations",
-                responses={
-                    status.HTTP_200_OK: openapi.Response("Organization details", OrganizationSerializer(many=True)),
-                    }
-        )
+        operation_summary="Get all organizations",
+        operation_description=  "This endpoint allows the user to update the details of an organization by retrieving an organization using the organization id - To create a new instance a send POST request with the required data",
+
+
+        responses={
+            status.HTTP_200_OK: openapi.Response("Organization details", OrganizationSerializer(many=True)),
+            }
+)
     def get_queryset(self):
         return Organization.objects.all()
       
@@ -150,11 +188,37 @@ class DeleteOrganizationView(APIView):
 
 #organizationwalletupdate changes
 
-class OrganizationWalletUpdateView(generics.RetrieveUpdateAPIView,):
+class OrganizationWalletUpdateView(generics.UpdateAPIView,):
+    """
+    This endpoint allows an admin user to update the organization wallet
+    The requested org_id must match the requested org_id inorder to update the wallet
+       ```
+        Example POST request data:
+        {
+            "org_id": "integer",
+            "balance": "enter amount 2dp",
+           
+        }
+        ```
+
+    """
+   
+
     #authentication_classes = [authentication.TokenAuthentication]
     queryset=OrganizationLunchWallet.objects.all()
     serializer_class = OrganizationLunchWalletSerializer
     permission_classes=[OrganisationAdmin]
+
+    @swagger_auto_schema(
+                        operation_summary="Update the organization wallet i.e balance by admin",
+                        responses={
+                            status.HTTP_200_OK: openapi.Response("User details", OrganizationLunchWalletSerializer()),
+                            status.HTTP_404_NOT_FOUND: "Organization not found for this user",
+                            status.HTTP_403_FORBIDDEN: "Permission denied",
+                            }
+                )
+
+
     
     def get_object(self):
         """get the org-id asssociated with a user"""
@@ -171,3 +235,4 @@ class OrganizationWalletUpdateView(generics.RetrieveUpdateAPIView,):
         return super().update(request,*args,**kwargs)  
 
 
+   

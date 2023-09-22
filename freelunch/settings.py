@@ -184,3 +184,8 @@ JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
 }
+SWAGGER_SETTINGS={
+    'USE_SESSION_AUTH':False,
+    'api_version':'1.0',
+    'enabled_methods':['get','post','put','patch','delete'],
+}
