@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import WithdrawalUpdateView, LunchWithdrawalCreateView
+from .views import WithdrawalUpdateView, WithdrawalCreateView
 
 urlpatterns = [
     path('withdrawal/request/', WithdrawalCreateView.as_view(), name='withdrawal-create'),
