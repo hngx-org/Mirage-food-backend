@@ -73,7 +73,7 @@ def get_a_lunch(request, id):
         )
 
     return Response({
-        "message": "Lunch request created successfully",
+        "message": "Lunch by ID",
         "statusCode": 201,
         "data": {
             "receiverId": lunch.receiver_id,
