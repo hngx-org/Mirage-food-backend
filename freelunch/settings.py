@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 import os
 from decouple import config
@@ -25,12 +25,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
-
+# SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = "yvwe8y7pgdbc8ue78778282638838"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "lunches",
     "organization",
     "rest_framework",
-]
+    ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -84,19 +84,34 @@ WSGI_APPLICATION = "freelunch.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mirage',
+        'USER': 'mirage',
+        'PASSWORD': 'mirage-098123',
+        'HOST': 'teammirrage-db.cpgeqjtedh92.us-east-1.rds.amazonaws.com',
+        'PORT': '3306',
     }
 }
 
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ['RDS_DB_NAME'],
+#         'USER': os.environ['RDS_USERNAME'],
+#         'PASSWORD': os.environ['RDS_PASSWORD'],
+#         'HOST': os.environ['RDS_HOSTNAME'],
+#         'PORT': os.environ['RDS_PORT'],
+#     }
+# }
+
+
 # pagination
-REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 10,
-}
+# REST_FRAMEWORK = {
+#     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+#     "PAGE_SIZE": 10,
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -116,11 +131,34 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+}
+
+
+SIMPLE_JWT = {
+  # It will work instead of the default serializer(TokenObtainPairSerializer).
+   # "TOKEN_OBTAIN_SERIALIZER": "authentication_app.serializers.CustomTokenObtainPairSerializer",
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=2),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": False,
+
+  # ...
+}
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'users.backends.CustomBackend',
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -139,15 +177,19 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-# MEDIA_URL = os.path.join(BASE_DIR, 'media/')
 
 # cloudinary config for profile picture upload
 cloudinary.config(
-    cloud_name=config("CLOUDINARY_CLOUD_NAME"),
-    api_key=config("CLOUDINARY_API_KEY"),
-    api_secret=config("CLOUDINARY_API_SECRET"),
+    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
+    api_key = config('CLOUDINARY_API_KEY'),
+    api_secret = config('CLOUDINARY_API_SECRET')
 )
 
+# cloudinary.config(
+#     cloud_name=os.environ['CLOUDINARY_CLOUD_NAME'],
+#     api_key=os.environ['CLOUDINARY_API_KEY'],
+#     api_secret=os.environ['CLOUDINARY_API_SECRET']
+# )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -155,4 +197,3 @@ cloudinary.config(
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = 'users.User'
-
