@@ -49,10 +49,12 @@ INSTALLED_APPS = [
     "organization",
     "rest_framework",
     "rest_framework.authtoken",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [   
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -91,8 +93,8 @@ DATABASES = {
         "NAME": config("DB_NAME"),
         "USER": config("DB_USER"),
         "PASSWORD": config("DB_PASSWORD"),
-        "port":"3306",
-        "HOST": config("DB_HOST")
+        # "port":"3306",
+        # "HOST": config("DB_HOST")
     }
 }
 

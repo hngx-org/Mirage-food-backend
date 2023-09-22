@@ -1,12 +1,36 @@
-from rest_framework import status
+from rest_framework.decorators import api_view
+from .models import Lunch
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from users.models import User
 from .models import Lunch
 from .serializers import LunchSerializer
+import ast
+from organization.models import Organization, OrganizationLunchWallet
+from rest_framework.authentication import SessionAuthentication  # Import the SessionAuthentication class if you want to use it for a specific view
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view
+from django.http import Http404
+from .serializers import LunchSerializer
+from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class WithdrawLunchView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Withdraw a lunch",
+        responses={
+             status.HTTP_201_CREATED: openapi.Response("Lunch redeemed sucessfully"),
+             status.HTTP_400_BAD_REQUEST: openapi.Response("Lunch has already been redeemed"),
+             status.HTTP_403_FORBIDDEN: openapi.Response("You're not authorized to withdraw this lunch"),
+             status.HTTP_404_NOT_FOUND: openapi.Response("Lunch is not found"),
+             })
     def post(self, request, pk, *args, **kwargs):
         try:
             lunch = Lunch.objects.get(id=pk)
@@ -37,29 +61,9 @@ class WithdrawLunchView(APIView):
                 {"message": "You're not authorized to withdraw this lunch"},
                 status.HTTP_403_FORBIDDEN,
             )
-from rest_framework.decorators import api_view
-from .models import Lunch
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from users.models import User
-from .models import Lunch
-from .serializers import LunchSerializer
-import ast
-from organization.models import Organization, OrganizationLunchWallet
-from rest_framework.authentication import SessionAuthentication  # Import the SessionAuthentication class if you want to use it for a specific view
-from rest_framework.permissions import AllowAny
-from rest_framework.decorators import api_view
-from django.http import Http404
-from .serializers import LunchSerializer
-from django.shortcuts import get_object_or_404
 
 
-# Create your views here.
+
 @api_view(['GET'])
 def get_a_lunch(request, id):
     """Returns an existing lunch by id"""
@@ -87,11 +91,14 @@ def get_a_lunch(request, id):
     }, status=status.HTTP_201_CREATED)
 
 
-# Create your views here.
-
 class CreateFreeLunchAPIView(APIView):
     #permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        operation_summary="Send a lunch",
+        responses={
+             status.HTTP_201_CREATED: openapi.Response("Lunch request created successfully"),
+             })
     def post(self, request, *args, **kwargs):
         # Get data from the rest body
         user = request.user
@@ -173,6 +180,10 @@ def update_free_lunch(request, id):
                     }, status=status.HTTP_201_CREATED)
                     
 class allFreeLunchesListView(APIView):
+    @swagger_auto_schema(
+            operation_summary="List all Lunches",
+            responses={status.HTTP_200_OK: openapi.Response("successfully fetched lunches", LunchSerializer(many=True))}
+    )
     def get(self, request):
         lunches = Lunch.objects.all()
         serializer = LunchSerializer(lunches, many=True)
@@ -180,8 +191,8 @@ class allFreeLunchesListView(APIView):
       
 
         response_data = {
-            "message": "Lunch request created successfully",
-            "statusCode": status.HTTP_201_CREATED,
+            "message": "successfully fetched lunches",
+            "statusCode": status.HTTP_200_OK,
             "data": finalData,
         }
 
@@ -200,6 +211,14 @@ def delete_free_lunch(id):
         return Response(response_data)
 
 class LunchDetailView(APIView):
+    @swagger_auto_schema(
+            operation_summary="Get a user's Lunch",
+            responses={
+                status.HTTP_200_OK: openapi.Response("User details", LunchSerializer()),
+                status.HTTP_404_NOT_FOUND: "Detail not found",
+                status.HTTP_403_FORBIDDEN: "Permission denied",
+                }
+    )
     def get(self, request, user_id, lunch_id):
         lunch = get_object_or_404(Lunch, sender_id=user_id, id=lunch_id)
         serializer = LunchSerializer(lunch)
