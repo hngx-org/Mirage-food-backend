@@ -17,7 +17,7 @@ class UserRetrieveUpdateSet(APIView):
         except User.DoesNotExist:
             return None
 
-    def get(self, request,id=None, format=None):
+    def get(self, request,id, format=None):
         """
         Gets user details
         """
