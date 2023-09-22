@@ -7,9 +7,16 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Withdrawal
 from .serializers import WithdrawalSerializer, WithdrawalRequestSerializer
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class LunchWithdrawalCreateView(APIView):
     permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        operation_summary="Request a withdrawal",
+        request_body=WithdrawalRequestSerializer,
+        responses={201: 'Created', 400: 'Bad Request'},
+    )
     def post(self, request, *args, **kwargs):
         serializer = WithdrawalRequestSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
