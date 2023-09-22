@@ -14,7 +14,7 @@ urlpatterns = [
     path('users/<int:user_id>/lunches/<int:lunch_id>',LunchDetailView.as_view(),name='lunch-detail'),
     path('search/<str:name_or_email>/', SearchUserView.as_view(), name='search-users'),
     path('auth/user/signup/', UserRegistrationView.as_view(), name='user-signup'),
-    path('users/login/', LoginView.as_view(), name='login')
+    path('auth/login/', LoginView.as_view(), name='login')
 
     
 ]

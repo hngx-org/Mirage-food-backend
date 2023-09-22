@@ -26,7 +26,17 @@ class LoginView(APIView):
             # If authentication is successful, create or retrieve a token
             token, created = Token.objects.get_or_create(user=user)
             login(request, user)  # Optional: Log the user in
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
+            response_data = {
+                "message": "User authenticated successfully",
+                "statusCode": status.HTTP_200_OK,
+                "data": {
+                    "access_token": token.key,
+                    "email": user.email,
+                    "id": user.id,
+                    "isAdmin": user.is_staff  # Assuming 'is_staff' signifies admin status
+                }
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
