@@ -18,13 +18,26 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from .models import Organization
+from users.permissions import IsAdmin
+from . import workers
 
-from django.shortcuts import render
 from rest_framework.views import APIView
 from .serializers import OrganizationLunchWalletSerializer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
+class OrganizationView(APIView):
+    permission_classes = [
+        IsAdmin,
+    ]
+
+    def post(self, request):
+        request.data["lunch_price"] = request.data.get("lunch_price", 1000)
+        serializer = OrganizationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        workers.Organization.create_organization(**serializer.validated_data)
+        return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
+    
 from rest_framework.decorators import api_view
 
 class OrganizationLunchWalletView(APIView):
