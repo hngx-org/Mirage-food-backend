@@ -13,6 +13,23 @@ from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
 from users.permissions import IsAdmin
 
+from .models import Organization
+
+from django.shortcuts import render
+from rest_framework.views import APIView
+from .serializers import OrganizationLunchWalletSerializer
+from rest_framework.response import Response
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+
+class OrganizationLunchWalletView(APIView):
+    def post(self, request):
+        serializer = OrganizationLunchWalletSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 # Create your views here.
 
 
@@ -73,5 +90,6 @@ class DeleteOrganizationView(APIView):
             return Response({'message':'Organization deleted'},status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({'error':'Organization not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 
