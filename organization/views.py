@@ -19,14 +19,15 @@ from drf_yasg import openapi
 
 
 from .models import Organization
+from users.permissions import IsAdmin
+from . import workers
 
-from django.shortcuts import render
 from rest_framework.views import APIView
 from .serializers import OrganizationLunchWalletSerializer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
-<<<<<<< HEAD
+
 #organizationwalletupdate changes
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -35,9 +36,22 @@ from rest_framework import generics, status
 from .serializers import OrganizationLunchWalletUpdateSerializer
 
 
-=======
+
+class OrganizationView(APIView):
+    permission_classes = [
+        IsAdmin,
+    ]
+
+    def post(self, request):
+        request.data["lunch_price"] = request.data.get("lunch_price", 1000)
+        serializer = OrganizationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        workers.Organization.create_organization(**serializer.validated_data)
+        return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
+    
+
 from rest_framework.decorators import api_view
->>>>>>> 2e4a341bb10e028bb9dc79bd4cf3be5b6e8c092b
+
 
 class OrganizationLunchWalletView(APIView):
     @swagger_auto_schema(
