@@ -1,6 +1,7 @@
+
 from django.db import models
-from django.conf import settings
 from users.models import User
+from organization.models import Organization
 
 class Lunch(models.Model):
     quantity = models.PositiveIntegerField(default=1)
@@ -18,6 +19,11 @@ class Lunch(models.Model):
         related_name="received_lunches",
         on_delete=models.CASCADE,
     )
+    org_id = models.ForeignKey(
+        Organization,
+        related_name='organization',
+        on_delete=models.CASCADE
+    )
     """
         The related name can be used to query the database
         efficiently... eg
@@ -29,4 +35,4 @@ class Lunch(models.Model):
         verbose_name_plural = "Lunches"
 
     def __str__(self):
-        return f"{self.sender} sent a lunch to {self.receiver}"
+        return f"{self.sender_id} sent a lunch to {self.receiver_id}"
