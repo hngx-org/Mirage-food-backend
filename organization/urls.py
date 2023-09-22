@@ -17,6 +17,9 @@ urlpatterns = [
     path("organization/invitations", views.ListInvitesView.as_view()),
     path('users/<int:user_id>/organizations/<int:org_id>', views.get_organization, name='get-organization'),
     path('get_balance/<int:organization_id>/', views.organization_balance, name='get_balance'),
-
-
-]
+    path(
+        'organization/lunch/update/',
+        OrganizationLunchPriceViewSet.as_view({'patch'}),
+        name='update_lunch_price'
+        )
+    ]

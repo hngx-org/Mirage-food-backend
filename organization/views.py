@@ -4,11 +4,19 @@ from .serializers import ListInvitesSerializer
 from .permissions import OrganisationAdmin
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-from .models import Organization, OrganizationLunchWallet, OrganizationInvites
+from .models import(
+        Organization,
+        OrganizationLunchWallet,
+        OrganizationInvites,
+        OrganizationLunchPrice
+        )
 from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
-from .serializers import OrganizationSerializer
+from .serializers import(
+        OrganizationSerializer,
+        OrganizationLunchPriceSerializer
+        )
 from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
 
@@ -20,6 +28,7 @@ from .serializers import OrganizationLunchWalletSerializer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
+
 class OrganizationLunchWalletView(APIView):
     def post(self, request):
         serializer = OrganizationLunchWalletSerializer(data=request.data)
@@ -29,7 +38,6 @@ class OrganizationLunchWalletView(APIView):
             return Response(serializer.data, status=HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-# Create your views here.
 
 
 class ListInvitesView(APIView):
@@ -80,5 +88,28 @@ class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
     def get_queryset(self):
         return Organization.objects.all()
 
-    ...
 
+class OrganizationLunchPriceViewSet(viewsets.ModelViewSet):
+    """
+    if user is an admin, they can update lunch prices
+    """
+    queryset = OrganizationLunchPrice.objects.all()
+    serializer_class = OrganizationLunchPriceSerializer
+
+    permission_classes = [OrganisationAdmin]
+
+    @action(detail=False, methods=['patch'])
+    def update_lunch_price(self, request):
+        try:
+            new_price = request.data['lunch_price']
+
+            org_lunch = OrganizationLunchPrice.objects.first()
+            org_lunch.lunch_price = new_price
+            org_lunch.save()
+
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(
+                    {'error': 'User not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                    )

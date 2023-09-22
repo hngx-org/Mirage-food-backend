@@ -1,8 +1,12 @@
 from rest_framework import serializers
-from .models import OrganizationLunchWallet
 
 
-from .models import OrganizationLunchWallet, Organization, OrganizationInvites
+from .models import (
+        OrganizationLunchWallet,
+        Organization,
+        OrganizationInvites,
+        OrganizationLunchPrice
+        )
 
 
 class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
@@ -28,3 +32,12 @@ class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
         fields = ["name", "lunch_price", "currency"]
+
+
+class OrganizationLunchPriceSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating lunch price
+    """
+    class Meta:
+        model = OrganizationLunchPrice
+        fields = ['lunch_price']
