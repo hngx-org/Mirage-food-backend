@@ -13,6 +13,8 @@ from .serializers import SearchedUserSerializer, UserBankDetailsSerializer
 from .permissions import isOwner, IsAdmin
 from django.http import Http404
 
+from .permissions import IsAdmin, isOwner
+
 # Create your views here.
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
