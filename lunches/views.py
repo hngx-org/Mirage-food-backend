@@ -73,7 +73,7 @@ def get_a_lunch(request, id):
         )
 
     return Response({
-        "message": "Lunch request created successfully",
+        "message": "Lunch by ID",
         "statusCode": 201,
         "data": {
             "receiverId": lunch.receiver_id,
@@ -91,6 +91,7 @@ def get_a_lunch(request, id):
 
 class CreateFreeLunchAPIView(APIView):
     #permission_classes = [AllowAny]
+    permission_classes = IsAuthenticated
 
     def post(self, request, *args, **kwargs):
         # Get data from the rest body

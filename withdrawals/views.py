@@ -17,8 +17,7 @@ class LunchWithdrawalCreateView(APIView):
             
             withdrawal = Withdrawal.objects.create(
                 amount=serializer.validated_data["amount"],
-                user_id=request.user
-            )
+                user_id=request.user)
             withdrawal.status = "redeemed"
             withdrawal.save()
 

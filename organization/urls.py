@@ -11,6 +11,7 @@ router = DefaultRouter()
 router.register("", OrganizationAPI, basename="organization")
 
 urlpatterns = [
+    path("organization/create", views.OrganizationView.as_view()),
     path('create/', OrganizationLunchWalletView.as_view(), name='create'),
     path("", include(router.urls)),
     path("organization/<int:pk>/",OrganizationAPI.as_view({"put": "update"}), name="organization"),

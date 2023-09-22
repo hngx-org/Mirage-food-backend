@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny , IsAuthenticated
 from django.contrib.auth import authenticate, login
 
 
@@ -32,26 +32,59 @@ class LoginView(APIView):
             # If authentication is successful, create or retrieve a token
             token, created = Token.objects.get_or_create(user=user)
             login(request, user)  # Optional: Log the user in
-            return Response({"token": token.key}, status=status.HTTP_200_OK)
+            response_data = {
+                "message": "User authenticated successfully",
+                "statusCode": status.HTTP_200_OK,
+                "access_token": token.key,
+                "email": user.email,
+                "id": user.id,
+                "isAdmin": user.is_staff  # Assuming 'is_staff' signifies admin status
+                }
+ 
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response(
                 {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
             )
 
 
-class DeleteUserView(APIView):
-    def get_user_by_pk(self, pk):
-        try:
-            return User.objects.get(pk=id)
-        except:
-            return Response(
-                {"error": "User does not exist."}, status=status.HTTP_404_NOT_FOUND
-            )
+# class DeleteUserView(APIView):
 
-    def delete_user(self, request, pk):
-        user = self.get_user_by_pk(pk=id)
-        user.delete()
-        return Response({"Message": "User Deleted"}, status=status.HTTP_204_NO_CONTENT)
+#     def get_user_by_pk(self, pk):
+#         try:
+#             return User.objects.get(pk=id)
+#         except:
+#             return Response({
+#                 'error': 'User does not exist.'
+#             }, status=status.HTTP_404_NOT_FOUND)
+
+#     def delete_user(self, request, pk):
+#         user = self.get_user_by_pk(pk=id)
+#         user.delete()
+#         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+class DeleteUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+
+        try:
+            user = User.objects.get(pk=id)
+            user.delete()
+            response = {
+                "status": "success",
+                "message": "User deleted successfully",
+            }
+            return Response(response, status=status.HTTP_204_NO_CONTENT)
+        except User.DoesNotExist:
+            error_response = {
+                "status": "error","message": "User does not exist",
+            }
+            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
 
 
 class UserRegistrationView(generics.CreateAPIView):
