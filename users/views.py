@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny , IsAuthenticated
 from django.contrib.auth import authenticate, login
 
 
@@ -40,20 +40,43 @@ class LoginView(APIView):
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+# class DeleteUserView(APIView):
+
+#     def get_user_by_pk(self, pk):
+#         try:
+#             return User.objects.get(pk=id)
+#         except:
+#             return Response({
+#                 'error': 'User does not exist.'
+#             }, status=status.HTTP_404_NOT_FOUND)
+
+#     def delete_user(self, request, pk):
+#         user = self.get_user_by_pk(pk=id)
+#         user.delete()
+#         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
+
 class DeleteUserView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    def get_user_by_pk(self, pk):
+    def delete(self, request, id):
+
         try:
-            return User.objects.get(pk=id)
-        except:
-            return Response({
-                'error': 'User does not exist.'
-            }, status=status.HTTP_404_NOT_FOUND)
+            user = User.objects.get(pk=id)
+            user.delete()
+            response = {
+                "status": "success",
+                "message": "User deleted successfully",
+            }
+            return Response(response, status=status.HTTP_204_NO_CONTENT)
+        except User.DoesNotExist:
+            error_response = {
+                "status": "error","message": "User does not exist",
+            }
+            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
 
-    def delete_user(self, request, pk):
-        user = self.get_user_by_pk(pk=id)
-        user.delete()
-        return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+
+
 
 
 class UserRegistrationView(generics.CreateAPIView):

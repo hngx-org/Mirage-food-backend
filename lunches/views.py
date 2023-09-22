@@ -91,6 +91,7 @@ def get_a_lunch(request, id):
 
 class CreateFreeLunchAPIView(APIView):
     #permission_classes = [AllowAny]
+    permission_classes = IsAuthenticated
 
     def post(self, request, *args, **kwargs):
         # Get data from the rest body

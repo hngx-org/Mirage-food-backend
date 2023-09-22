@@ -11,6 +11,7 @@ from users.models import User
 from .serializers import OrganizationSerializer
 from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Organization
 from users.permissions import IsAdmin
@@ -23,7 +24,7 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 class OrganizationView(APIView):
     permission_classes = [
-        IsAdmin,
+        IsAuthenticated,
     ]
 
     def post(self, request):

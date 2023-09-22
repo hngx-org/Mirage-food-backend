@@ -21,6 +21,5 @@ urlpatterns = [
     path('auth/user/signup/', UserRegistrationView.as_view(), name='user-signup'),
     # path('auth/login/', LoginView.as_view(), name='login'),
      path('auth/login/', TokenObtainPairView.as_view(), name='login')
-
     
 ]
