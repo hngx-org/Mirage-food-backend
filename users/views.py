@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-from .serializers import UserRegistrationSerializer,UserListSerializer
+from .serializers import UserRegistrationSerializer,UserListSerializer, UserAddBankAccountSerializer
 from .models import User
 from rest_framework.views import APIView
 from rest_framework import status
@@ -40,22 +40,55 @@ class LoginView(APIView):
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-# class DeleteUserView(APIView):
 
-#     def get_user_by_pk(self, pk):
-#         try:
-#             return User.objects.get(pk=id)
-#         except:
-#             return Response({
-#                 'error': 'User does not exist.'
-#             }, status=status.HTTP_404_NOT_FOUND)
+# class UserProfileView(APIView):
+#     permission_classes = [IsAuthenticated]
 
-#     def delete_user(self, request, pk):
-#         user = self.get_user_by_pk(pk=id)
-#         user.delete()
-#         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
+    # def get(self, request, id):
+    #     try:
+    #         user = User.objects.get(pk=id)
+    #         serializer = UserListSerializer(user)
+    #         response = {
+    #             "status": "success",
+    #             "message": "User retrieved successfully",
+    #             "data": serializer.data
+    #         }
+    #         return Response(response, status=status.HTTP_200_OK)
+    #     except User.DoesNotExist:
+    #         response = {
+    #             "status": "error",
+    #             "message": "User does not exist",
+    #         }
+    #         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-class DeleteUserView(APIView):
+
+class UserAddBankAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, id):
+        try:
+            user = User.objects.get(pk=id)
+
+            data = request.data
+            serializer = UserAddBankAccountSerializer(user, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                response = {
+                    "status": "success",
+                    "message": "successfully created bank account",
+
+                }
+                return Response(response, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            response = {
+                "status": "error",
+                "message": "User does not exist",
+            }
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+
+
+class RetrieveDeleteUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, id):
@@ -73,6 +106,24 @@ class DeleteUserView(APIView):
                 "status": "error","message": "User does not exist",
             }
             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
+        
+    def get(self, request, id):
+        try:
+            user = User.objects.get(pk=id)
+            serializer = UserListSerializer(user)
+            response = {
+                "status": "success",
+                "message": "User retrieved successfully",
+                "data": serializer.data
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            response = {
+                "status": "error",
+                "message": "User does not exist",
+            }
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
 
 
 
