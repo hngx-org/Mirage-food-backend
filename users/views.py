@@ -12,6 +12,11 @@ from django.contrib.auth import authenticate, login
 from .serializers import SearchedUserSerializer
 from django.http import Http404
 
+from django.urls import reverse
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib, os, ssl
+
 # Create your views here.
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
@@ -122,3 +127,82 @@ class SearchUserView(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
+
+
+
+
+class RequestPasswordResetView(generics.GenericAPIView):
+    """
+    View that sends the user an email providing them with the reset token
+    associated with their user account.
+    """
+
+    from_email = 'rorobitega.hng.mirage@gmail.com'
+    from_passwd = 'wptjcdiycgwagnsu'
+    queryset = User.objects.all()
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    lookup_field = 'email'
+
+    def send_email(self, to_email, reset_token):
+        em = MIMEMultipart()
+        em['From'] = "Mirage Lunch App"
+        em['Subject'] = "Password reset link"
+        em.attach(MIMEText(f"""
+Hello User, You requested for a password reset. <br/> 
+Here is your reset token: <b>{reset_token}</b> 
+<br/><br/>
+If this was not you, kindly ignore this email.
+<br/>
+Stay Kind :)""", 'html'))
+
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=ssl.create_default_context()) as smtp:
+            smtp.login(self.from_email, self.from_passwd)
+            smtp.sendmail(self.from_email, to_email, em.as_string())
+
+        return True 
+
+    # this view sends an email to a user providing them with the reset token
+    # associated with their 
+    def get(self, request, *args, **kwargs):
+        user = self.get_object()
+        new_token = User.generate_reset_token(5)
+        user.password_reset_token = new_token
+        user.save()
+        self.send_email(kwargs['email'], new_token)
+        return Response({'message':'Email successfully sent!'}, status=status.HTTP_200_OK)
+
+
+class ConfirmResetTokenView(generics.GenericAPIView):
+    "View that confirms the token the user provides is the one associated with their account."
+
+    queryset = User.objects.all()
+    lookup_field = 'email'
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+
+    def get(self, request, token, *args, **kwargs):
+        user = self.get_object()
+        if user.password_reset_token == token:
+            return Response({'message':'Token Authorized'}, status=status.HTTP_200_OK)
+        return Response({'message':'Invalid token!'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class PasswordResetView(generics.GenericAPIView):
+    "View that resets the user's password"
+
+    queryset = User.objects.all()
+    lookup_field = 'password_reset_token'
+    lookup_url_kwarg = 'token'
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        user = self.get_object()
+        passwd1, passwd2 = request.data.get('password1'), request.data.get('password2')
+        if passwd1 != passwd2:
+            return Response({'message':"Passwords do not match!"}, status=status.HTTP_400_BAD_REQUEST) 
+        user.set_password(passwd1)
+        # generate a fresh token for the user
+        user.password_reset_token = User.generate_reset_token(5)
+        user.save()
+        return Response({'message':'Password reset successfully :)'}, status=status.HTTP_200_OK)
