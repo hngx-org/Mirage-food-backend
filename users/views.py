@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-from .serializers import UserRegistrationSerializer,UserListSerializer,UserAddBankAccountSerializer
+from .serializers import UserRegistrationSerializer,UserListSerializer,UserAddBankAccountSerializer,UserUpdateSerializer,UserProfilePictureSerializer
 from .models import User
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -205,3 +205,28 @@ class SearchUserView(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
+class UserUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserUpdateSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class UserProfilePictureUpdateView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserProfilePictureSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
