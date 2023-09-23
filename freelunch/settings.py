@@ -206,3 +206,12 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'abiolaadedayo1993@gmail.com'
 EMAIL_HOST_PASSWORD = 'yshaddajfbbbdixc'
+
+SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": False,  # Disable session authentication
+    "SECURITY_DEFINITIONS": {
+        "basic": {
+            "type": "basic",
+        },
+    },
+}
