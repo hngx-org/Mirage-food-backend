@@ -4,6 +4,11 @@ from .models import OrganizationLunchWallet
 
 from .models import OrganizationLunchWallet, Organization, OrganizationInvites
 
+class OrganizationInviteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrganizationInvites
+        fields = ['email', 'token' , 'org_id']
+
 
 class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
     """
@@ -28,3 +33,4 @@ class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
         fields = ["name", "lunch_price", "currency"]
+
