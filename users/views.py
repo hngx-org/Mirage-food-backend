@@ -41,31 +41,10 @@ class LoginView(APIView):
 
 
 
-# class UserProfileView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-    # def get(self, request, id):
-    #     try:
-    #         user = User.objects.get(pk=id)
-    #         serializer = UserListSerializer(user)
-    #         response = {
-    #             "status": "success",
-    #             "message": "User retrieved successfully",
-    #             "data": serializer.data
-    #         }
-    #         return Response(response, status=status.HTTP_200_OK)
-    #     except User.DoesNotExist:
-    #         response = {
-    #             "status": "error",
-    #             "message": "User does not exist",
-    #         }
-    #         return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-
 class UserAddBankAccountView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def put(self, request, id):
+    def patch(self, request, id):
         try:
             user = User.objects.get(pk=id)
 
@@ -130,10 +109,40 @@ class RetrieveDeleteUserView(APIView):
 
 
 
-class UserRegistrationView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserRegistrationSerializer
-    permission_classes = [AllowAny]
+# class UserRegistrationView(generics.CreateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserRegistrationSerializer
+#     permission_classes = [AllowAny]
+
+class UserRegistrationView(APIView):
+    permission_classes = [
+        AllowAny
+    ]
+
+    def post(self, request):
+        data = request.data
+        lunch_credit_balance = 1000
+        data['lunch_credit_balance'] = lunch_credit_balance
+
+        serializer = UserRegistrationSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            response = {
+                "status": "success",
+                "message": "User created successfully",
+                "data": serializer.data,
+            }
+            return Response(response, status=status.HTTP_201_CREATED)
+
+        bad_response = {
+            "status": "error",
+            "message": "Bad request",
+            "data": serializer.errors,
+        }
+        return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 class UserListViewSet(APIView):
     def get(self, request, *args, **kwargs):
         """

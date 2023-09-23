@@ -1,10 +1,6 @@
 from rest_framework import serializers
 from .models import Withdrawal
 
-class WithdrawalSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Withdrawal
-        fields = '__all__'
 
 
 class WithdrawalRequestSerializer(serializers.Serializer):
@@ -12,3 +8,7 @@ class WithdrawalRequestSerializer(serializers.Serializer):
     bank_number = serializers.CharField(max_length=20)
     bank_code = serializers.CharField(max_length=20)
     amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        model = Withdrawal
+        fields = '__all__'
