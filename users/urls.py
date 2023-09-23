@@ -2,7 +2,7 @@ from django.urls import path
 from .views import LoginView
 from .views import DeleteUserView
 from django.urls import path
-from .views import UserListViewSet, LoginView
+from .views import UserListViewSet, LoginView, UserViewSet
 from lunches.views import LunchDetailView
 from .views import UserRegistrationView
 

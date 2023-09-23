@@ -8,7 +8,6 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
 from .models import User
-from rest_framework.response import Response
 from rest_framework import status, viewsets
 
 from .serializers import UserListSerializer
@@ -19,7 +18,6 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
-from .serializers import LoginSerializer
 from rest_framework.authtoken.models import Token
 
 
