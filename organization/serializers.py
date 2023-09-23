@@ -20,11 +20,15 @@ class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrganizationLunchWallet
 
+
  # Corrected the field name
 
         fields = ['balance', 'orgnization']
 
-        fields = ['balance', 'org_id']
+   
+
+        fields = ['org_id','balance']
+
 
 
 
@@ -42,4 +46,14 @@ class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
         fields = ["name", "lunch_price", "currency"]
+
+
+#organizationwalletupdate changes
+class OrganizationLunchWalletUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for organization lunch wallet model
+    """
+    class Meta:
+        model = OrganizationLunchWallet
+        fields = ['balance']
 
