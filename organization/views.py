@@ -231,10 +231,9 @@ class DeleteOrganizationView(APIView):
 
 class OrganizationWalletUpdateView(generics.UpdateAPIView,):
 
-    #authentication_classes = [authentication.TokenAuthentication]
-    #queryset=OrganizationLunchWallet.objects.all()
+    authentication_classes = [authentication.TokenAuthentication]
     serializer_class = OrganizationLunchWalletUpdateSerializer
-    #permission_classes=[OrganisationAdmin]
+    permission_classes=[OrganisationAdmin]
 
     @swagger_auto_schema(
         operation_summary="Update the organization wallet",
