@@ -1,4 +1,3 @@
-
 from django.db import models
 from users.models import User
 from organization.models import Organization

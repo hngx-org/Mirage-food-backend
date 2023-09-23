@@ -2,13 +2,14 @@ from django.urls import path
 from .views import LoginView
 from .views import DeleteUserView
 from django.urls import path
-from .views import UserListViewSet, LoginView
+from .views import UserListViewSet, LoginView, UserViewSet
 from lunches.views import LunchDetailView
 from .views import SearchUserView
 from .views import UserRegistrationView, UserDetailView
 
 
 urlpatterns = [
+    path('organization/<int:org_id>/user/<int:user_id>', UserViewSet.as_view(), name='get-org_user'),
     path("users/all", UserListViewSet.as_view(), name="users-list"),
     path("users/<int:id>/", DeleteUserView.as_view()),
     path(

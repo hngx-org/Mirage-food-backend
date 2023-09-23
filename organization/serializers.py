@@ -27,7 +27,7 @@ class ListInvitesSerializer(serializers.ModelSerializer):
 class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
-        fields = ["name", "lunch_price", "currency"]
+        fields = ["id", "name", "lunch_price", "currency"]
 
 #organizationwalletupdate changes
 class OrganizationLunchWalletUpdateSerializer(serializers.ModelSerializer):

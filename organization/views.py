@@ -1,10 +1,3 @@
-from rest_framework import authentication
-from rest_framework.views import APIView
-from .serializers import ListInvitesSerializer
-from .permissions import OrganisationAdmin
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from .models import Organization, OrganizationLunchWallet, OrganizationInvites
 from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
