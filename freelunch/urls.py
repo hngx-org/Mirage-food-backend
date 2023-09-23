@@ -1,3 +1,21 @@
+
+from django.contrib import admin
+from django.urls import path, include
+
+from rest_framework.routers import DefaultRouter
+from organization.views import InvitationViewSet
+
+router = DefaultRouter()
+router.register(r'invitations', InvitationViewSet)
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+    path('users/', include(router.urls)),
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+
 """
 URL configuration for freelunch project.
 
@@ -36,12 +54,18 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
+
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("organization.urls")),
     path('api/', include('lunches.urls')),
+
+
+
+    # Add other URL patterns as needed
+
     path('api/', include('withdrawals.urls')),
     path('api/',include('users.urls')),        
     re_path(
@@ -59,4 +83,5 @@ urlpatterns = [
         schema_view.with_ui('redoc', cache_timeout=0),
         name='schema-redoc',
     )
+
 ]
