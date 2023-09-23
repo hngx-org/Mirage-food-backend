@@ -14,6 +14,7 @@ from rest_framework import generics, viewsets
 
 from .models import Organization
 from users.permissions import IsAdmin
+from rest_framework.permissions import IsAuthenticated
 from . import workers
 
 from rest_framework.views import APIView
@@ -23,7 +24,7 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 class OrganizationView(APIView):
     permission_classes = [
-        IsAdmin,
+        IsAuthenticated,
     ]
 
     def post(self, request):

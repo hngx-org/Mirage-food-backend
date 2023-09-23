@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from .serializers import UserRegistrationSerializer,UserListSerializer,UserAddBankAccountSerializer
 from .models import User
+from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -85,7 +86,8 @@ class UserProfileView(APIView):
 class UserAddBankAccountView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def put(self, request, id):
+    def patch(self, request: Request, id):
+       
         try:
             user = User.objects.get(pk=id)
 
