@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import LoginView
-from .views import DeleteUserView, UserProfileView, UserAddBankAccountView
+from .views import DeleteUserView, UserProfileView, UserAddBankAccountView, UserUpdateView, UserProfilePictureUpdateView
 from django.urls import path
 from .views import UserListViewSet, LoginView
 
@@ -22,6 +22,8 @@ urlpatterns = [
     path('auth/user/signup', UserRegistrationView.as_view(), name='user-signup'),
     # path('auth/login/', LoginView.as_view(), name='login')
     path('auth/login', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('user/<int:pk>/', UserUpdateView.as_view(), name='user-update'),
+    path('update-profile-picture/<int:pk>/', UserProfilePictureUpdateView.as_view(), name='update-profile-picture'),
 
 
     
