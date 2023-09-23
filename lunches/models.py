@@ -22,7 +22,7 @@ class Lunch(models.Model):
     org_id = models.ForeignKey(
         Organization,
         related_name='organization',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     """
         The related name can be used to query the database
