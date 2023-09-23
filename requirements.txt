@@ -14,6 +14,7 @@ gunicorn
 python-decouple
 python-dotenv
 python-slugify
+drf-yasg
 pytz
 six
 sqlparse
