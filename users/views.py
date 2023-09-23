@@ -6,21 +6,20 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
+from django.contrib.auth import authenticate, login
+
 
 from .models import User
-from rest_framework import status, viewsets
-
-from .serializers import UserListSerializer
-from .serializers import UserRegistrationSerializer
-
-from rest_framework import generics, permissions
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
+from .serializers import (
+    UserRegistrationSerializer,
+    UserListSerializer,
+    SearchedUserSerializer,
+    UserDetailsSerializer,
+)
+from . import workers
 
 
+# Create your views here.
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
     # Get username and password from the request
@@ -78,6 +77,25 @@ class UserViewSet(viewsets.ModelViewSet):
                 'error': 'User does not exist'
             }, status=status.HTTP_404_NOT_FOUND)
 
+        if user is not None:
+            # If authentication is successful, create or retrieve a token
+            token, created = Token.objects.get_or_create(user=user)
+            login(request, user)  # Optional: Log the user in
+            response_data = {
+                "message": "User authenticated successfully",
+                "statusCode": status.HTTP_200_OK,
+                "data": {
+                    "access_token": token.key,
+                    "email": user.email,
+                    "id": user.id,
+                    "isAdmin": user.is_staff  # Assuming 'is_staff' signifies admin status
+                }
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
 
 class DeleteUserView(APIView):
