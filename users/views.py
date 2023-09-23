@@ -127,10 +127,45 @@ class UserAddBankAccountView(APIView):
     #     return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 
-class UserRegistrationView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserRegistrationSerializer
-    permission_classes = [AllowAny]
+# class UserRegistrationView(generics.CreateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserRegistrationSerializer
+#     permission_classes = [AllowAny]
+
+
+class UserRegistrationView(APIView):
+    permission_classes = [
+        AllowAny
+    ]
+
+    def post(self, request):
+        data = request.data
+        lunch_credit_balance = 1000
+        data['lunch_credit_balance'] = lunch_credit_balance
+
+        serializer = UserRegistrationSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            response = {
+                "status": "success",
+                "message": "User created successfully",
+                "data": serializer.data,
+            }
+            return Response(response, status=status.HTTP_201_CREATED)
+
+        bad_response = {
+            "status": "error",
+            "message": "Bad request",
+            "data": serializer.errors,
+        }
+        return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
 class UserListViewSet(APIView):
     def get(self, request, *args, **kwargs):
         """
