@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY",default="mydefaultvalue")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -93,7 +93,8 @@ DATABASES = {
         "NAME": config("DB_NAME"),
         "USER": config("DB_USER"),
         "PASSWORD": config("DB_PASSWORD"),
-        "port":"3306"
+        # "port":"3306",
+        # "HOST": config("DB_HOST")
     }
 }
 
@@ -172,10 +173,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     "PAGE_SIZE": 10,
 # }
 
+"""REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'PAGE_SIZE': 10
+}"""
+
+
 # Set JWT authentication settings
 JWT_AUTH = {
     'JWT_SECRET_KEY': 'your-secret-key',  # Replace with your secret key
     'JWT_ALGORITHM': 'HS256',
     'JWT_ALLOW_REFRESH': True,
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+}
+SWAGGER_SETTINGS={
+   
+    'api_version':'1.0',
+    'enabled_methods':['get','post','put','patch','delete'],
 }

@@ -32,3 +32,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+
+class UserDetailsSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField(source='pk')
+    profile_picture = serializers.ImageField(source='profile_pic')
+    f_name = serializers.CharField(source='first_name')
+    second_name = serializers.CharField(source='last_name')
+
+    
+
+    
