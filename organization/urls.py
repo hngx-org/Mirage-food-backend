@@ -23,5 +23,5 @@ urlpatterns = [
     path('get_balance/<int:organization_id>/', views.organization_balance, name='get_balance'),
     path("organization/wallet/update",views.OrganizationWalletUpdateView.as_view(),name="wallet-update"),
     path('users/<int:org_id>/', DeleteOrganizationView.as_view(), name='delete_organization'),
-
+]
 

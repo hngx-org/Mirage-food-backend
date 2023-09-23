@@ -59,7 +59,7 @@ class LoginView(APIView):
 
         return Response(response_data)
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(APIView):
     serializer_class = UserListSerializer
 
     def get_queryset(self):
