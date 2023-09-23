@@ -50,3 +50,14 @@ class UserAddBankAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "bank_code", "bank_name", "bank_number"]
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'phone', 'bank_number', 'bank_code', 'bank_name', 'lunch_credit_balance']
+
+
+class UserProfilePictureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['profile_pic']
