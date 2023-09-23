@@ -271,7 +271,7 @@ class OrganizationWalletUpdateView(generics.UpdateAPIView,):
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
        
        
-        """if not request.user.is_staff:
+        if not request.user.is_staff:
         
             return Response({"error":"You do not have permission to change the balance"})
         return super().update(request,*args,**kwargs)  """
