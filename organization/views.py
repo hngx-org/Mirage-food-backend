@@ -12,7 +12,6 @@ from .serializers import OrganizationSerializer
 from rest_framework.views import APIView
 # from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
-from users.permissions import IsAdmin
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -161,6 +160,7 @@ class UserOrganizationAPI(APIView):
 
     def get_queryset(self):
         return Organization.objects.all()
+      
       
 class DeleteOrganizationView(APIView):
     """this endpoint allows an admin user to delete a user"""

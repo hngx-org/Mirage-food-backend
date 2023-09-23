@@ -3,7 +3,7 @@ from .views import OrganizationLunchWalletView
 from . import views
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .views import OrganizationAPI, UserOrganizationAPI, DeleteOrganizationView
+from .views import OrganizationAPI, UserOrganizationAPI
 
 #oragnizationwalletupdate changes
 from .views import OrganizationWalletUpdateView
@@ -24,6 +24,4 @@ urlpatterns = [
     path("organization/wallet/update",views.OrganizationWalletUpdateView.as_view(),name="wallet-update"),
     path('users/<int:org_id>/', DeleteOrganizationView.as_view(), name='delete_organization'),
 
-
-]
 
