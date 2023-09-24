@@ -7,10 +7,13 @@ django-colorfield
 djangorestframework
 djangorestframework-jwt
 djangorestframework-simplejwt
+drf-yasg
 mysqlclient
 Pillow
 PyJWT
 gunicorn
+inflection
+packaging
 python-decouple
 python-dotenv
 python-slugify
@@ -21,3 +24,4 @@ sqlparse
 text-unidecode
 typing_extensions
 urllib3
+uritemplate

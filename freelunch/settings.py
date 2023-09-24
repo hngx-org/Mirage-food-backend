@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "lunches",
     "organization",
     "rest_framework",
-    'drf_yasg',
+    "drf_yasg",
     ]
 
 MIDDLEWARE = [
@@ -58,7 +58,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django-cors-headers"
 ]
 
 ROOT_URLCONF = "freelunch.urls"
