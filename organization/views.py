@@ -53,22 +53,34 @@ from .models import(
 from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
-<<<<<<< HEAD
+
+from .serializers import OrganizationSerializer, OrganizationInviteSerializer
+
 from .serializers import(
         OrganizationSerializer,
         OrganizationLunchPriceSerializer
         )
+
 from rest_framework.decorators import api_view
 from .serializers import OrganizationSerializer
 from rest_framework.views import APIView
 # from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django.core.mail import EmailMessage
+import secrets
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 
 from .models import Organization
+
+from .models import OrganizationInvites
+
+
+
 from users.permissions import IsAdmin
 from . import workers
 
@@ -87,13 +99,7 @@ from .serializers import OrganizationLunchWalletUpdateSerializer
 from rest_framework.decorators import api_view
 
 
-<<<<<<< HEAD
 class OrganizationLunchWalletView(APIView):
-=======
-
-class OrganizationView(APIView):
-    permission_classes = [ IsAdmin,]
->>>>>>> 180d01ac0945fe0739cc74b9f05870bbd243500b
     @swagger_auto_schema(
            
             operation_summary="Allows an admin to create an organization",
@@ -126,6 +132,49 @@ class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
     )
     def get_queryset(self):
         return Organization.objects.all()
+
+
+    ...
+
+
+
+class OrganizationInviteCreateView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]  
+
+    def post(self, request, *args, **kwargs):
+        # Validate the request data using the serializer
+        serializer = OrganizationInviteSerializer(data=request.data)
+        if serializer.is_valid():
+            # Generate an invite token 
+            invite_token = secrets.token_urlsafe(8)
+
+            # Creates and save the organization invite to the database
+            invite = OrganizationInvites(
+                org_id=request.user.org_id,  
+                email=serializer.validated_data["email"],
+                token=invite_token,
+            )
+            invite.save()
+
+            # Send an email invitation to the invitee
+            try:
+                email_subject = f"Invitation to Join  {request.user.org_id.name}"
+                email_body = f"You are invited to join our organization - {request.user.org_id.name}. Use this token: {invite_token}"
+                email = EmailMessage(email_subject, email_body, from_email= "freelunch - mirage", to=[serializer.validated_data['email']])
+                email.send()
+            except Exception as Error:
+                print(Error)
+
+            # Respond with a success message
+            response_data = {
+                "message": "success",
+                "statusCode": 200,
+                "data": None
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        # If the serializer is not valid, it will respond with validation errors
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrganizationLunchWalletView(APIView):
@@ -230,8 +279,7 @@ class DeleteOrganizationView(APIView):
             }
     )
 
-<<<<<<< HEAD
-=======
+
 
     def delete(request, org_id):
         organization = Organization.object.get(pk=org_id)
@@ -289,11 +337,11 @@ class OrganizationWalletUpdateView(generics.UpdateAPIView,):
         if not request.user.is_staff:
         
             return Response({"error":"You do not have permission to change the balance"})
-        return super().update(request,*args,**kwargs)  """
+        return super().update(request,*args,**kwargs)
 
 
    
->>>>>>> 180d01ac0945fe0739cc74b9f05870bbd243500b
+
 
 class OrganizationLunchPriceViewSet(viewsets.ModelViewSet):
     """
@@ -304,7 +352,7 @@ class OrganizationLunchPriceViewSet(viewsets.ModelViewSet):
 
     permission_classes = [OrganisationAdmin]
 
-    @action(detail=False, methods=['patch'])
+    # @action(detail=False, methods=['patch'])
     def update_lunch_price(self, request):
         try:
             new_price = request.data['lunch_price']
@@ -319,3 +367,4 @@ class OrganizationLunchPriceViewSet(viewsets.ModelViewSet):
                     {'error': 'User not found'},
                     status=status.HTTP_404_NOT_FOUND
                     )
+

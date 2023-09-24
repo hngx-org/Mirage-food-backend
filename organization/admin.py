@@ -1,8 +1,13 @@
 from django.contrib import admin
 
+from .models import Organization, OrganizationLunchWallet, OrganizationInvites
+
 
 from .models import Invitation
-
+@admin.register(OrganizationInvites)
+class OganizationInviteAdmin(admin.ModelAdmin):
+    list_display = ['org_id', 'email', 'token', 'TTL']
+    
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('name', 'lunch_price', 'currency', 'created_at', 'updated_at')
@@ -28,9 +33,3 @@ class InvitationAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related('sender', 'receiver', 'organization')
 
 
-from .models import Organization, OrganizationInvites, OrganizationLunchWallet
-
-# Register your models here.
-admin.site.register(Organization)
-admin.site.register(OrganizationLunchWallet)
-admin.site.register(OrganizationInvites)

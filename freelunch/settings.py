@@ -163,7 +163,11 @@ cloudinary.config(
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 
-AUTH_USER_MODEL = 'users.User'
+# AUTH_USER_MODEL = 'users.User'
+
+
+# For sending email
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -197,3 +201,4 @@ SWAGGER_SETTINGS={
     'api_version':'1.0',
     'enabled_methods':['get','post','put','patch','delete'],
 }
+

@@ -43,6 +43,11 @@ class OrganizationSerializer(serializers.ModelSerializer):
         fields = ["name", "lunch_price", "currency"]
 
 
+
+#Serializer for Organization Invite
+class OrganizationInviteSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
 class OrganizationLunchPriceSerializer(serializers.ModelSerializer):
     """
     Serializer for updating lunch price
@@ -60,3 +65,4 @@ class OrganizationLunchWalletUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrganizationLunchWallet
         fields = ['balance']
+
