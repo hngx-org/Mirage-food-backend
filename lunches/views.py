@@ -7,6 +7,7 @@ from users.models import User
 from organization.models import Organization, OrganizationLunchWallet
 from .models import Lunch
 from .serializers import LunchSerializer
+from django.db.models import Q
 
 
 class CreateOrganizationFreeLunchApiView(APIView):
@@ -138,25 +139,31 @@ class RetrieveLunchView(APIView):
         try:
 
             lunch = Lunch.objects.get(pk=id)
-            serializer = LunchSerializer(lunch)
-            response = {
-                "message": "successfully fetched lunches",
-                "statusCode": status.HTTP_200_OK,
-                "data": serializer.data
-            }
-            return Response(response, status=status.HTTP_200_OK)
+            if request.user.id == lunch.sender_id or request.user.id == lunch.receiver_id:
+                serializer = LunchSerializer(lunch)
+                response = {
+                    "message": "successfully fetched lunches",
+                    "statusCode": status.HTTP_200_OK,
+                    "data": serializer.data
+                }
+                return Response(response, status=status.HTTP_200_OK)
+            else:
+                forbidden_response = {"message": "You're not authorized to view this lunch"}
+                return Response(forbidden_response, status=status.HTTP_403_FORBIDDEN)
         except Lunch.DoesNotExist:
             return Response(
                 {"message": "Lunches not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
 
+
 class ListAllLunchesView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         
-        lunches = Lunch.objects.all()
+        user = request.user
+        lunches = Lunch.objects.filter(Q(sender_id=user.id) | Q(receiver_id=user.id)).all()
         serializer = LunchSerializer(lunches, many=True)
         response = {
                 "message": "successfully fetched lunches",
@@ -164,6 +171,8 @@ class ListAllLunchesView(APIView):
                 "data": serializer.data
             }
         return Response(response, status=status.HTTP_200_OK)
+
+
 
 
 class UserRedeemLunch(APIView):

@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework import generics
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from django.contrib.auth import authenticate, login
 
 
@@ -42,7 +42,7 @@ class LoginView(APIView):
 
 
 class DeleteUserView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
     def delete(self, request, pk):
 
@@ -167,6 +167,8 @@ class UserRegistrationView(APIView):
 
 
 class UserListViewSet(APIView):
+    permission_classes = [IsAdminUser]
+
     def get(self, request, *args, **kwargs):
         """
         Get user details
@@ -182,6 +184,7 @@ class UserListViewSet(APIView):
 
 
 class SearchUserView(APIView):
+    permission_classes = [IsAuthenticated]
     "Api view accepting either a name (first or last) or email parameter to search for a user"
 
     def get_object(self, param:str):
