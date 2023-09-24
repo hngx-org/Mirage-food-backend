@@ -53,3 +53,15 @@ class OrganizationInvites(models.Model):
 
     def __str__(self):
         return f'{self.email}'
+
+
+class OrganizationLunchPrice(models.Model):
+    """
+    Model for updating lunch price
+    """
+    lunch_price = models.DecimalField(
+            decimal_places=2,
+            max_digits=10,
+            null=False,
+            default=0.00
+            )
