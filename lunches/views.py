@@ -1,225 +1,226 @@
-from rest_framework.decorators import api_view
-from .models import Lunch
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from users.models import User
+from rest_framework.views import APIView
 from .models import Lunch
-from .serializers import LunchSerializer
-import ast
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from organization.models import Organization, OrganizationLunchWallet
-from rest_framework.authentication import SessionAuthentication  # Import the SessionAuthentication class if you want to use it for a specific view
-from rest_framework.permissions import AllowAny
-from rest_framework.decorators import api_view
-from django.http import Http404
 from .serializers import LunchSerializer
-from django.shortcuts import get_object_or_404
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from users.models import User
+from django.db.models import Q
 
 
-class WithdrawLunchView(APIView):
-    @swagger_auto_schema(
-        operation_summary="Withdraw a lunch",
-        responses={
-             status.HTTP_201_CREATED: openapi.Response("Lunch redeemed sucessfully"),
-             status.HTTP_400_BAD_REQUEST: openapi.Response("Lunch has already been redeemed"),
-             status.HTTP_403_FORBIDDEN: openapi.Response("You're not authorized to withdraw this lunch"),
-             status.HTTP_404_NOT_FOUND: openapi.Response("Lunch is not found"),
-             })
-    def post(self, request, pk, *args, **kwargs):
-        try:
-            lunch = Lunch.objects.get(id=pk)
-        except Lunch.DoesNotExist:
+
+# Create your views here.
+
+class CreateOrganizationFreeLunchApiView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        receiver_id = data.get('receiver_id')
+        quantity = data.get('quantity')
+        note = data.get('note')
+        data['sender_id'] = request.user.id
+        data['org_id'] = request.user.org_id.id
+
+        organization = Organization.objects.filter(id=request.user.org_id.id).first()
+
+        organization_lunch_price = organization.lunch_price
+        organization_wallet = OrganizationLunchWallet.objects.filter(org_id=organization).first()
+        organization_wallet_balance = organization_wallet.balance
+
+        if receiver_id == request.user.id:
             return Response(
-                {"message": "Lunch is not found"}, status.HTTP_404_NOT_FOUND
+                {"error": "You can't send lunch to yourself"},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
-        if request.user == lunch.receiver:
-            if not lunch.redeemed:
-                lunch.redeemed = True
-                lunch.save()
-
-                serializer = LunchSerializer(lunch)
-                return Response(
-                    serializer.data,
-                    {"message": "Lunch redeemed successfully"},
-                    status.HTTP_201_CREATED,
-                )
-
-            else:
-                return Response(
-                    {"message": "Lunch has already been redeemed"},
-                    status.HTTP_400_BAD_REQUEST,
+        if int(organization_wallet_balance) < (int(quantity) * organization_lunch_price):
+            return Response(
+                    {"error": "Organization doesn't have enough lunch credits"},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
         else:
-            return Response(
-                {"message": "You're not authorized to withdraw this lunch"},
-                status.HTTP_403_FORBIDDEN,
-            )
+            # Create a lunch request
+            serializer = LunchSerializer(data=data)
+            if serializer.is_valid():
+                # Update the lunch credit balance for the user
+                organization_wallet.balance = int(organization_wallet_balance) - (int(quantity)*organization_lunch_price)
+                organization_wallet.save()
 
+                # Create a lunch request
+                serializer.save()
 
-
-@api_view(['GET'])
-def get_a_lunch(request, id):
-    """Returns an existing lunch by id"""
-
-    try:
-        lunch = Lunch.objects.get(id=id)
-    except Lunch.DoesNotExist:
-        return Response(
-            {"error": "Lunch not found"},
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-    return Response({
-        "message": "Lunch by ID",
-        "statusCode": 201,
-        "data": {
-            "receiverId": lunch.receiver_id,
-            "senderId": lunch.sender_id_id,
-            "quantity": lunch.quantity,
-            "redeemed": lunch.redeemed,
-            "note": lunch.note,
-            "created_at": lunch.created_at,
-            "id": lunch.id
-        }
-    }, status=status.HTTP_201_CREATED)
+                response = {
+                    "message": "Lunch request created successfully",
+                    "statusCode": status.HTTP_201_CREATED,
+                    "data": serializer.data
+                }
+                return Response(response, status=status.HTTP_201_CREATED)
+            else:
+                bad_response = {
+                    "message": "Lunch request not created",
+                    "statusCode": status.HTTP_400_BAD_REQUEST,
+                    "data": serializer.errors
+                }
+                return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CreateFreeLunchAPIView(APIView):
     #permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Send a lunch",
-        responses={
-             status.HTTP_201_CREATED: openapi.Response("Lunch request created successfully"),
-             })
     def post(self, request, *args, **kwargs):
         # Get data from the rest body
+        data = request.data
+
+        receiver_id = data.get('receiver_id')
+        quantity = data.get('quantity')
+        note = data.get('note')
+        org_id_id = data.get('org_id_id')
+
         user = request.user
-        #user = User.objects.get(email="abdullahishuaibumaje@gmail.com")
-        user_id=user.id
-        receivers = request.data.get('receivers')
-        try:
-            receivers_list = ast.literal_eval(receivers)
-            quantity = request.data.get('quantity', 0)
-            note = request.data.get('note', '')
-        except Exception as e:
-            error=str(e)
-            return Response({'message':error})
 
-        # Validate the data as needed
-        if not receivers_list:
-            return Response({"message": "Receivers field is required"}, status=status.HTTP_400_BAD_REQUEST)
+        # Check if the user has enough lunch credits
+        if int(user.lunch_credit_balance) <= int(quantity * 100):
 
-        data = []
-        
-        for receiver_id in receivers_list:
-            # skip if the user is trying to send to himself
-            if receiver_id==user_id:
-                continue
-            else:
-                try:
-                    # Attempt to fetch the receiver instance based on the receiver_id
-                    receiver = User.objects.get(id=int(receiver_id))
+            return Response(
+                {"error": "You don't have enough lunch credits"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        elif user.id == receiver_id:
+            return Response(
+                {"error": "You can't send lunch to yourself"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        else:
+            # Create a lunch request
+            data['sender_id'] = user.id  # Set the sender_id
+            serializer = LunchSerializer(data=data)
 
-                    # Create the Lunch object with the receiver instance
-                    lunch = Lunch.objects.create(sender_id=user, receiver=receiver, note=note, quantity=quantity)
-                    # Serialize and append the lunch data
-                    lunch_serialized = LunchSerializer(lunch)
-                    data.append(lunch_serialized.data)
-                except User.DoesNotExist:
-                    return Response({"message": f"User with ID {receiver_id} does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-                except Exception as e:
-                    error = str(e)
-                    return Response({'message': error}, status=status.HTTP_400_BAD_REQUEST)
+            if serializer.is_valid():
 
-        return Response({"message": "Lunch request created successfully",
-                         "statusCode": 201,
-                         "data": data})
+                  # Update the lunch credit balance for the user
+
+                organization = Organization.objects.filter(id=org_id_id).first()
+                organization_lunch_price = organization.lunch_price
+                if request.user.org_id.id == org_id_id:
+                    user.lunch_credit_balance = int(user.lunch_credit_balance) - (int(quantity)*organization_lunch_price)
+                    user.save()
+
+                # Create a lunch request
+                    serializer.save()
+                else:
+                    user.lunch_credit_balance = int(user.lunch_credit_balance) - (int(quantity)*100)
+                    user.save()
+
+                    # Create a lunch request
+                    serializer.save()
+                
+
+
+                response = {
+                    "message": "Lunch request created successfully",
+                    "statusCode": status.HTTP_201_CREATED,
+                    "data": serializer.data
+                }
+                return Response(response, status=status.HTTP_201_CREATED)
+            bad_response = {
+                    "message": "Lunch request not created",
+                    "statusCode": status.HTTP_400_BAD_REQUEST,
+                    "data": serializer.errors
+                }
+        return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
     
 
-@api_view(['DELETE'])
-def delete_free_lunch(id):
+class RetrieveLunchView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
         try:
-                freelunch = Lunch.objects.get(id=id)
-                freelunch.delete()
-                return Response({'Message': 'Free Lunch Deleted'}, status=status.HTTP_200_OK)
-        except Lunch.DoesNotExist:
-                raise Http404("Free Lunch does not exist at the moment")
-
-
-@api_view(['PATCH'])
-def update_free_lunch(request, id):
-        try:
-                freelunch = Lunch.objects.get(id=id)
-        except Lunch.DoesNotExist:
-                return Response(f"No free lunch with id {id}")
-        
-        if request.method == "PATCH":
-                serializer = LunchSerializer(freelunch, data=request.data, partial=True)
-                if serializer.is_valid():
-                        serializer.save()
-                        return Response({
-                        "message": "Lunch request created successfully",
-                        "statusCode": 201,
-                        "data": {
-                            "receiverId": Lunch.receiver_id,
-                            "senderId": Lunch.sender_id_id,
-                            "quantity": Lunch.quantity,
-                            "redeemed": Lunch.redeemed,
-                            "note": Lunch.note,
-                            "created_at": Lunch.created_at,
-                            "id": Lunch.id
-                        }
-                    }, status=status.HTTP_201_CREATED)
-                    
-class allFreeLunchesListView(APIView):
-    @swagger_auto_schema(
-            operation_summary="List all Lunches",
-            responses={status.HTTP_200_OK: openapi.Response("successfully fetched lunches", LunchSerializer(many=True))}
-    )
-    def get(self, request):
-        lunches = Lunch.objects.all()
-        serializer = LunchSerializer(lunches, many=True)
-        finalData = serializer.data
-      
-
-        response_data = {
-            "message": "successfully fetched lunches",
-            "statusCode": status.HTTP_200_OK,
-            "data": finalData,
-        }
-
-        return Response(response_data)
-
-
-@api_view(['DELETE'])
-def delete_free_lunch(id):
-        try:
-                freelunch = Lunch.objects.get(id=id)
-                freelunch.delete()
-                return Response({'Message': 'Free Lunch Deleted'}, status=status.HTTP_200_OK)
-        except Lunch.DoesNotExist:
-                raise Http404("Free Lunch does not exist at the moment")
-
-        return Response(response_data)
-
-class LunchDetailView(APIView):
-    @swagger_auto_schema(
-            operation_summary="Get a user's Lunch",
-            responses={
-                status.HTTP_200_OK: openapi.Response("User details", LunchSerializer()),
-                status.HTTP_404_NOT_FOUND: "Detail not found",
-                status.HTTP_403_FORBIDDEN: "Permission denied",
+            lunch = Lunch.objects.get(pk=id)
+            if request.user.id == lunch.sender_id or request.user.id == lunch.receiver_id:
+                serializer = LunchSerializer(lunch)
+                response = {
+                    "message": "successfully fetched lunches",
+                    "statusCode": status.HTTP_200_OK,
+                    "data": serializer.data
                 }
-    )
-    def get(self, request, user_id, lunch_id):
-        lunch = get_object_or_404(Lunch, sender_id=user_id, id=lunch_id)
-        serializer = LunchSerializer(lunch)
-        return Response(serializer.data)
+                return Response(response, status=status.HTTP_200_OK)
+            else:
+                forbidden_response = {"message": "You're not authorized to view this lunch"}
+                return Response(forbidden_response, status=status.HTTP_403_FORBIDDEN)
+        except Lunch.DoesNotExist:
+            return Response(
+                {"message": "Lunches not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+class ListAllLunchesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        lunches = Lunch.objects.filter(Q(sender_id=user.id) | Q(receiver_id=user.id)).all()
+        serializer = LunchSerializer(lunches, many=True)
+
+        response = {
+                "message": "successfully fetched lunches",
+                "statusCode": status.HTTP_200_OK,
+                "data": serializer.data
+            }
+        return Response(response, status=status.HTTP_200_OK)
+    
+
+    
+class UserRedeemLunch(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        lunch_id = data.get('id')
+        try:
+            lunch = Lunch.objects.get(pk=lunch_id)
+        except Lunch.DoesNotExist:
+            return Response(
+                {"message": "Lunch is not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+   
+        if request.user.id == lunch.receiver_id.id:
+
+            if not lunch.redeemed:
+                lunch.redeemed = True
+
+                # Update the lunch credit balance for the user
+                organization = Organization.objects.filter(id=request.user.org_id.id).first()
+                organization_lunch_price = organization.lunch_price
+                if organization:
+                    user = User.objects.get(pk=request.user.id)
+                    user_lunch_wallet_balance = (int(lunch.quantity) * organization_lunch_price) + int(user.lunch_credit_balance)
+                    user.lunch_credit_balance = user_lunch_wallet_balance
+
+
+                else:
+                    user = User.objects.get(pk=request.user.id)
+                    user_lunch_wallet_balance = (int(lunch.quantity) * 100) + int(user.lunch_credit_balance)
+                    user.lunch_credit_balance = user_lunch_wallet_balance
+                # Save the changes to the lunch and user objects
+                lunch.save()
+                user.save()
+
+                # Serialize the lunch object for the response
+                serializer = LunchSerializer(lunch)
+                response = {"message": "Lunch redeemed successfully",
+                            "data": serializer.data}
+
+                return Response(response, status=status.HTTP_201_CREATED)
+            else:
+                bad_response = {"message": "Lunch has already been redeemed"}
+                return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            forbidden_response = {"message": "You're not authorized to redeem this lunch"}
+            return Response(forbidden_response, status=status.HTTP_403_FORBIDDEN)
+            
+ 
+        

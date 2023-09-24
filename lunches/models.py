@@ -9,12 +9,9 @@ class Lunch(models.Model):
     note = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    sender_id = models.ForeignKey(
-        User,
-        related_name="sent_lunches",
-        on_delete=models.CASCADE,
-    )
-    receiver = models.ForeignKey(
+    sender_id = models.BigIntegerField()
+    
+    receiver_id = models.ForeignKey(
         User,
         related_name="received_lunches",
         on_delete=models.CASCADE,

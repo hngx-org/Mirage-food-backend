@@ -1,24 +1,17 @@
 from django.urls import path
-from .views import OrganizationLunchWalletView
-from . import views
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
-from .views import OrganizationAPI, UserOrganizationAPI, DeleteOrganizationView
-
-app_name = "organization"
-
-router = DefaultRouter()
-router.register("", OrganizationAPI, basename="organization")
+from .views import (CreateOrganizationView,
+                    CreateOrganizationInviteView,
+                    CreateStaffFromOrganizationView,
+                    StaffConfirmTokenAndSignUpView,
+                    OrganizationLunchWalletView,
+                    UpdateOrganizationLunchPriceView)
 
 urlpatterns = [
-    path("", include(router.urls)),
-    path("organization/create", views.OrganizationView.as_view()),
-    path('create/', OrganizationLunchWalletView.as_view(), name='create'),
-    path("organization/<int:pk>/", OrganizationAPI.as_view({"put": "update"}), name="organization"),
-    path("organization/invitations", views.ListInvitesView.as_view()),
-    path('users/<int:user_id>/organizations/<int:org_id>', views.UserOrganizationAPI.as_view(), name='get-organization'),
-    path('get_balance/<int:organization_id>/', views.organization_balance, name='get_balance'),
-    path('users/<int:org_id>/', DeleteOrganizationView.as_view(), name='delete_organization')
+    path("organization/create", CreateOrganizationView.as_view(), name="create-organization"),
+    path("organization/invite", CreateOrganizationInviteView.as_view(), name="create-invite"),
+    path("organization/staff/auth/signup", CreateStaffFromOrganizationView.as_view(), name="create-staff-from-invite"),
+    path("organization/staff/signup", StaffConfirmTokenAndSignUpView.as_view(), name="staff-signup"),
+    path("organization/wallet/update", OrganizationLunchWalletView.as_view(), name="update-organization-wallet"),
+    path("organization/lunch/update", UpdateOrganizationLunchPriceView.as_view(), name="update-organization-lunch-price"),    
 
 ]
-

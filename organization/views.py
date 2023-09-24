@@ -1,138 +1,287 @@
 from rest_framework import authentication
 from rest_framework.views import APIView
-from .serializers import ListInvitesSerializer
-from .permissions import OrganisationAdmin
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
+from users.serializers import UserRegistrationSerializer
 from .models import Organization, OrganizationLunchWallet, OrganizationInvites
 from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
-from .serializers import OrganizationSerializer
-from rest_framework.views import APIView
-# from rest_framework.decorators import api_view
+from .serializers import OrganizationSerializer, OrganizationInvites, OrganizationInviteSerializer, OrganizationLunchWalletSerializer
+from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
-from users.permissions import IsAdmin
-
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-
+from rest_framework.permissions import IsAuthenticated
+import secrets
+from django.urls import reverse
+from django.contrib.auth.hashers import make_password
+from rest_framework.permissions import AllowAny
 from .models import Organization
 from users.permissions import IsAdmin
+from django.core.mail import send_mail
 from . import workers
 
-from rest_framework.views import APIView
-from .serializers import OrganizationLunchWalletSerializer
-from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
-class OrganizationView(APIView):
+
+class CreateOrganizationView(APIView):
     permission_classes = [
-        IsAdmin,
+        IsAdmin
     ]
 
     def post(self, request):
-        request.data["lunch_price"] = request.data.get("lunch_price", 1000)
-        serializer = OrganizationSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        workers.Organization.create_organization(**serializer.validated_data)
-        return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
-    
-from rest_framework.decorators import api_view
-
-class OrganizationLunchWalletView(APIView):
-    @swagger_auto_schema(
-        operation_summary="Create organization wallet",
-        request_body=OrganizationLunchWalletSerializer,
-        responses={201: 'Created', 400: 'Bad Request'},
-    )
-    def post(self, request):
-        serializer = OrganizationLunchWalletSerializer(data=request.data)
+        data = request.data
+        serializer = OrganizationSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-# Create your views here.
-
-
-class ListInvitesView(APIView):
-    """
-    If user is an admin this lists all the invites in their Organisation
-    """
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [OrganisationAdmin]
-
-    @swagger_auto_schema(
-        operation_summary="List Organization Invitations",
-        responses={status.HTTP_200_OK: openapi.Response("successful", ListInvitesSerializer)},
-    )
-    def get(self, request):
-        user = request.user
-        invites = OrganizationInvites.objects.filter(org_id=user.org_id)
-        return Response(ListInvitesSerializer(invites).data)
-
-@api_view(['GET'])
-def organization_balance(request, organization_id):
+            response = {
+                "status": "success",
+                "message": "organization created successfully",
+                "data": serializer.data
+            }
+            return Response(response, status=status.HTTP_201_CREATED)
+        bad_response = {
+                "status": "error",
+                "message": "bad request",
+                "data": serializer.errors
+            }
+        return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
     
-    organization = get_object_or_404(Organization, id=organization_id)
-
-    # Query the OrganizationLunchWallet model to get the balance for this organization
-    lunch_wallet = OrganizationLunchWallet.objects.filter(org_id=organization_id).first()
-
-    if lunch_wallet:
-        balance = lunch_wallet.balance
-    else:
-        balance = 0.00  # default balance if no lunch wallet record exists
-
-    return JsonResponse({'organization_balance': balance})
 
 
-class UserOrganizationAPI(APIView):
-    @swagger_auto_schema(
-                operation_summary="Get a user's organization",
-                responses={
-                    status.HTTP_200_OK: openapi.Response("User details", OrganizationSerializer()),
-                    status.HTTP_404_NOT_FOUND: "Organization not found for this user",
-                    status.HTTP_403_FORBIDDEN: "Permission denied",
-                    }
-        )
-    def get(request, user_id, org_id):
-        try:
-            user = User.objects.get(pk=user_id)
-            organization = user.org_id  # Retrieve the organization associated with the user
-            if organization and organization.id == org_id:
-                serializer = OrganizationSerializer(organization)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response({'error': 'Organization not found for this user'}, status=status.HTTP_404_NOT_FOUND)
-        except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+class CreateOrganizationInviteView(APIView):
+    permission_classes = [
+        IsAdmin
+    ]
 
-class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
-    """Base view for organization update (put | patch)"""  # can be modified when adding other methods
+    def post(self, request):
+        data = request.data
+        org_admin = User.objects.get(pk=request.user.id)
+        org_id = org_admin.org_id
+        data["org_id"] = org_id.id
+        token = secrets.token_urlsafe(10)
+        data["token"] = token
+        serializer = OrganizationInviteSerializer(data=data)
+        if serializer.is_valid():
+            # Save the data to the database
+            invite = serializer.save()
 
-    serializer_class = OrganizationSerializer
+            # Send email to the invitee
+            subject = 'Invitation to join Mirage Free Lunch App'
+            message = 'This is your invitation token.'
+            from_email = 'abiolaadedayo1993@gmail.com'
+            recipient_list = [invite.email]
+            token = invite.token  # Access the token from the saved instance
 
-    @swagger_auto_schema(
-                operation_summary="Get all organizations",
-                responses={
-                    status.HTTP_200_OK: openapi.Response("Organization details", OrganizationSerializer(many=True)),
-                    }
-        )
-    def get_queryset(self):
-        return Organization.objects.all()
-      
-class DeleteOrganizationView(APIView):
+            # Generate the invitation URL
+            invite_url = f"https://mirage-backend.onrender.com/api/organization/staff/signup?token={token}"
+            message += f'\n\n{invite_url}'
+
+            try:
+                send_mail(subject, message, from_email, recipient_list)
+                response = {
+                    "status": "success",
+                    "message": "Invitation email sent successfully"
+                }
+                return Response(response, status=status.HTTP_200_OK)
+            except Exception as e:
+                failed_response = {
+                    "status": "failed",
+                    "message": f"Email not sent: {str(e)}"
+                }
+                return Response(failed_response, status=status.HTTP_400_BAD_REQUEST)
+
+        bad_response = {
+            "status": "error",
+            "message": "Bad request",
+            "data": serializer.errors
+            }
+        return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class CreateStaffFromOrganizationView(APIView):
+    permission_classes = [
+        IsAdmin
+    ]
+    def post(self, request):
+        data = request.data
+        lunch_credit_balance = 1000
+        data['lunch_credit_balance'] = lunch_credit_balance
+        org_admin = User.objects.get(pk=request.user.id)
+        org_id = org_admin.org_id
+
+        # Check if the organization invite exists for the provided email
+        organization_invite = OrganizationInvites.objects.filter(email=data["email"]).first()
+        if not organization_invite:
+            bad_response = {
+                "status": "error",
+                "message": "Organization invite not found for the provided email",
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Assign org_id and refresh_token to data
+        data["org_id"] = org_id.id
+        data["refresh_token"] = organization_invite.token
+
+        serializer = UserRegistrationSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            response = {
+                "status": "success",
+                "message": "Staff created successfully",
+                "data": serializer.data,
+            }
+            return Response(response, status=status.HTTP_201_CREATED)
+
+        bad_response = {
+            "status": "error",
+            "message": "Bad request",
+            "data": serializer.errors,
+        }
+        return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StaffConfirmTokenAndSignUpView(APIView):
+    permission_classes = [
+        AllowAny
+    ]
+
+    def post(self, request):
+        data = request.data
+        refresh_token = request.query_params.get("token")
+        user = User.objects.filter(refresh_token=refresh_token).first()
+        if not user:
+            bad_response = {
+                "status": "error",
+                "message": "Invalid token",
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+        # Explicitly hash the password
+        password = data.get("password")
+        if password:
+            hashed_password = make_password(password)
+            user.password = hashed_password
+
+        serializer = UserRegistrationSerializer(user, data=data)
+        if serializer.is_valid():
+            user.refresh_token = None
+            serializer.save()
+            response = {
+                "status": "success",
+                "message": "User Account Created successfully",
+                "data": serializer.data,
+            }
+            return Response(response, status=status.HTTP_201_CREATED)
+
+        bad_response = {
+            "status": "error",
+            "message": "Bad request",
+            "data": serializer.errors,
+        }
+        return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class OrganizationLunchWalletView(APIView):
     permission_classes = [IsAdmin]
-    def delete(request, org_id):
-        organization = Organization.object.get(pk=org_id)
-        if request.user in organization.user_set.all():
-            organization.delete()
-            return Response({'message':'Organization deleted'},status=status.HTTP_204_NO_CONTENT)
+
+    def post(self, request):
+        org_id = request.user.org_id.id
+        lunch_wallet = OrganizationLunchWallet.objects.filter(org_id=org_id).first()
+        if not lunch_wallet:
+            data = request.data
+            data["org_id"] = org_id
+            serializer = OrganizationLunchWalletSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                response = {
+                    "status": "success",
+                    "message": "Organization lunch wallet created successfully",
+                    "data": serializer.data,
+                }
+                return Response(response, status=status.HTTP_201_CREATED)
+            else:
+                bad_response = {
+                    "status": "error",
+                    "message": "Bad request",
+                    "data": serializer.errors,
+                }
+                return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'error':'Organization not found'}, status=status.HTTP_404_NOT_FOUND)
+            bad_response = {
+                "status": "error",
+                "message": "Organization lunch wallet already exists",
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    def patch(self, request):
+        org_id = request.user.org_id.id
+        lunch_wallet = OrganizationLunchWallet.objects.filter(org_id=org_id).first()
+        if not lunch_wallet:
+            bad_response = {
+                "status": "error",
+                "message": "Organization lunch wallet not found",
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = OrganizationLunchWalletSerializer(lunch_wallet, data=request.data, partial=True)
+        if serializer.is_valid():
+            new_balance = float(lunch_wallet.balance) + float(request.data.get("balance", 0))
+            lunch_wallet.balance = new_balance
+            lunch_wallet.save()
+
+            response = {
+                "status": "success",
+                "message": "Organization lunch wallet updated successfully",
+                "data": serializer.data,
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            bad_response = {
+                "status": "error",
+                "message": "Bad request",
+                "data": serializer.errors,
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateOrganizationLunchPriceView(APIView):
+    permission_classes = [IsAdmin]
+
+    def patch(self, request):
+        org_id = request.user.org_id.id
+        organization = Organization.objects.filter(id=org_id).first()
+        if not organization:
+            bad_response = {
+                "status": "error",
+                "message": "Organization not found",
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = OrganizationSerializer(organization, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+
+            response = {
+                "status": "success",
+                "message": "Organization lunch price updated successfully",
+                "data": serializer.data,
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            bad_response = {
+                "status": "error",
+                "message": "Bad request",
+                "data": serializer.errors,
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
 
 
 
