@@ -25,3 +25,4 @@ text-unidecode
 typing_extensions
 urllib3
 uritemplate
+whitenoise
