@@ -114,8 +114,8 @@ class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
 
 
 class OrganizationLunchWalletView(APIView):
-   
     permission_classes = [OrganisationAdmin]
+
     @swagger_auto_schema(
         method="post",
         operation_summary="Create organization wallet",
@@ -208,8 +208,6 @@ class DeleteOrganizationView(APIView):
     @swagger_auto_schema(
         operation_summary="Delete a user",
         operation_description=  "This endpoint allows an admin  to delete a user. It takes in the org_id",
-
-
         responses={
             status.HTTP_200_OK: openapi.Response("Organization details", OrganizationSerializer(many=True)),
             status.HTTP_404_NOT_FOUND: "Organization not found for this user",
@@ -234,8 +232,7 @@ class DeleteOrganizationView(APIView):
 class OrganizationWalletUpdateView(generics.UpdateAPIView,):
 
     authentication_classes = [authentication.TokenAuthentication]
-    queryset=OrganizationLunchWallet.objects.all()
-    serializer_class = OrganizationLunchWalletSerializer
+    serializer_class = OrganizationLunchWalletUpdateSerializer
     permission_classes=[OrganisationAdmin]
 
     @swagger_auto_schema(
@@ -248,20 +245,35 @@ class OrganizationWalletUpdateView(generics.UpdateAPIView,):
             }
     )
 
-    
     def get_object(self):
         """get the org-id asssociated with a user"""
-        org_id=self.request.user.org_id
+        user=self.request.user
+        org_id=self.request.user.id
         try:
-            return  OrganizationLunchWallet.objects.get(org_id=org_id)
-
+            wallet=  OrganizationLunchWallet.objects.get(id=org_id)
+            return wallet
         except: OrganizationLunchWallet.DoesNotExist
 
-    def update(self,request,*args,**kwargs):
+    def patch(self,request,*args,**kwargs):
+        wallet=self.get_object()
+        serializer=self.get_serializer(wallet,data=request.data,partial=True)
+        response_data={
+            "message":"success",
+            "status":status.HTTP_200_OK,
+            "balance":None
+        }
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(response_data, status=HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+       
+       
         if not request.user.is_staff:
         
             return Response({"error":"You do not have permission to change the balance"})
-        return super().update(request,*args,**kwargs)  
+        return super().update(request,*args,**kwargs)  """
 
 
    
