@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework import generics
 from rest_framework.permissions import AllowAny , IsAuthenticated
 from django.contrib.auth import authenticate, login
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 from .serializers import SearchedUserSerializer
@@ -39,6 +40,27 @@ class LoginView(APIView):
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
+
+# This logout view only blacklists the refresh token, and has no
+# effect on the access token. In the future, the access token's
+# lifespan would be reduced to restrict acess to both tokens
+# within a reasonable timeframe.
+class LogoutView(APIView):
+    """View that accepts a refresh token and blacklists it as a form of logout mechanism"""
+
+    # So authentication credentials are not required to blacklist a token
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.data.get('refresh_token') or request.data.get('refresh')
+        if not refresh_token:
+            return Response({'error':'Request token not provided'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({'message':'User Successfully logged out'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 # class DeleteUserView(APIView):
 
