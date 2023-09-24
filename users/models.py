@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from cloudinary.models import CloudinaryField
 from organization.models import Organization
+import random
 
 
 class UserManager(BaseUserManager):
@@ -62,6 +63,12 @@ class User(PermissionsMixin, AbstractBaseUser):
         'auth.Group', verbose_name='groups', blank=True, related_name='custom_users_groups')
     user_permissions = models.ManyToManyField(
         'auth.Permission', verbose_name='user permissions', blank=True, related_name='custom_users_permissions')
+
+    @staticmethod
+    def generate_reset_token(length):
+        ret = (random.randint(0, 9).__str__() for _ in range(length))
+        return ''.join(ret)
+    password_reset_token = models.CharField(max_length=5, default=generate_reset_token(5), editable=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
