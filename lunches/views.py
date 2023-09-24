@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Lunch
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from organization.models import Organization
+from organization.models import Organization, OrganizationLunchWallet
 from .serializers import LunchSerializer
 from users.models import User
 from django.db.models import Q

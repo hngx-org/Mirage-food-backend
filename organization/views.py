@@ -71,7 +71,7 @@ class CreateOrganizationInviteView(APIView):
             token = invite.token  # Access the token from the saved instance
 
             # Generate the invitation URL
-            invite_url = f"http://127.0.0.1/api/organization/staff/signup?token={token}"
+            invite_url = f"https://mirage-backend.onrender.com/api/organization/staff/signup?token={token}"
             message += f'\n\n{invite_url}'
 
             try:
@@ -146,7 +146,7 @@ class StaffConfirmTokenAndSignUpView(APIView):
 
     def post(self, request):
         data = request.data
-        refresh_token = data["token"]
+        refresh_token = request.query_params.get("token")
         user = User.objects.filter(refresh_token=refresh_token).first()
         if not user:
             bad_response = {

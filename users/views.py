@@ -8,11 +8,19 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny , IsAuthenticated, IsAdminUser
 from django.contrib.auth import authenticate, login
 
-
 from .serializers import SearchedUserSerializer
 from django.http import Http404
 
 # Create your views here.
+
+
+class ApiStatusView(APIView):
+    permission_classes = [ AllowAny]
+
+    def  get(self, request):
+        return Response("API is Live", status=status.HTTP_200_OK)
+
+
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
     # Get username and password from the request

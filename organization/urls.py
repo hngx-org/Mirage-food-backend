@@ -12,7 +12,7 @@ urlpatterns = [
     path("organization/staff/auth/signup", CreateStaffFromOrganizationView.as_view(), name="create-staff-from-invite"),
     path("organization/staff/signup", StaffConfirmTokenAndSignUpView.as_view(), name="staff-signup"),
     path("organization/wallet/update", OrganizationLunchWalletView.as_view(), name="update-organization-wallet"),
-    path("organization/launch/update", UpdateOrganizationLunchPriceView.as_view(), name="update-organization-lunch-price"),    
+    path("organization/lunch/update", UpdateOrganizationLunchPriceView.as_view(), name="update-organization-lunch-price"),    
 
 ]
 
