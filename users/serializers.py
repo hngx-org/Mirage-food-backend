@@ -21,7 +21,13 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'org_id', 'first_name', 'last_name', 'profile_pic', 'email', 'phone', 'created_at', 'updated_at', 'lunch_credit_balance']
-User = get_user_model()
+
+class SearchedUserSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='pk')
+    profile_picture = serializers.ImageField(source='profile_pic')
+    class Meta:
+        model = User 
+        fields = ['user_id', 'first_name', 'last_name', 'email', 'profile_picture']
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,3 +45,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+
+class UserDetailsSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField(source='pk')
+    profile_picture = serializers.ImageField(source='profile_pic')
+    f_name = serializers.CharField(source='first_name')
+    second_name = serializers.CharField(source='last_name')
+
+    
+
+    
