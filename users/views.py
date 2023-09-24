@@ -208,6 +208,7 @@ class SearchUserView(APIView):
 class UserUpdateView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserUpdateSerializer
+    permission_classes = [IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -222,6 +223,7 @@ class UserUpdateView(generics.RetrieveUpdateAPIView):
 class UserProfilePictureUpdateView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserProfilePictureSerializer
+    permission_classes = [IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
