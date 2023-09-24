@@ -8,12 +8,11 @@ from .models import Withdrawal
 from .serializers import WithdrawalSerializer, WithdrawalRequestSerializer
 
 
-class LunchWithdrawalCreateView(APIView):
+class WithdrawalCreateView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         serializer = WithdrawalRequestSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-
             
             withdrawal = Withdrawal.objects.create(
                 amount=serializer.validated_data["amount"],
@@ -25,7 +24,7 @@ class LunchWithdrawalCreateView(APIView):
             response_data = {
                 "id": withdrawal.id,
                 "user_id": withdrawal.user_id.id,
-                "status": withdrawal.status,
+                "status": "success",
                 "amount": withdrawal.amount,
                 "created_at": withdrawal.created_at.isoformat(),
             }
@@ -39,7 +38,6 @@ class LunchWithdrawalCreateView(APIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class WithdrawalUpdateView(generics.RetrieveUpdateAPIView):
     queryset = Withdrawal.objects.all()

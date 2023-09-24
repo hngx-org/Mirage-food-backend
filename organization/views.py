@@ -11,6 +11,7 @@ from users.models import User
 from .serializers import OrganizationSerializer
 from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Organization
 from users.permissions import IsAdmin
@@ -23,7 +24,7 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 class OrganizationView(APIView):
     permission_classes = [
-        IsAdmin,
+        IsAuthenticated,
     ]
 
     def post(self, request):
@@ -95,3 +96,23 @@ class OrganizationAPI(generics.UpdateAPIView, viewsets.GenericViewSet):
 
     ...
 
+class OrganizationInviteView(APIView):
+    """
+    If user is an admin this lists all the invites in their Organisation
+    """
+
+    permission_classes = [OrganisationAdmin]
+
+    def get(self, request):
+        user = request.user
+        invites = OrganizationInvites.objects.filter(org_id=user.org_id)
+        return Response(ListInvitesSerializer(invites).data)
+
+    def post(self, request):
+        invite_created_and_sent = workers.Organization.create_organization_invite(
+            admin_user=request.user, to_email=request.data.get("email")
+        )
+        if invite_created_and_sent:
+            return Response({"message": "Invite sent"}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Invite failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
