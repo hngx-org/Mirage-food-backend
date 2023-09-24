@@ -73,18 +73,28 @@ class CreateFreeLunchAPIView(APIView):
     def post(self, request, *args, **kwargs):
 
         data = request.data
-
         receiver_id = data.get('receiver_id')
         quantity = data.get('quantity')
+        if quantity is None:
+            quantity = 1
         note = data.get('note')
-        org_id_id = data.get('org_id_id')
-        sender_id = data.get('sender_id')
+        request.user.id
+        user = User.objects.get(pk=request.user.id)
+        if user.org_id_id is None:
+            return Response(
+                {"error": "Only user with an organization can send a lunch"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        organization = Organization.objects.filter(id=request.user.org_id_id).first()
+        org_id_id = organization.id
+        organization_lunch_price = organization.lunch_price
+        
         # Get the user making the request
         user = request.user
        
         # Check if the user has enough lunch credits
-        if int(user.lunch_credit_balance) < (int(quantity) * 100):
+        if int(user.lunch_credit_balance) < (int(quantity) * int(organization_lunch_price)):
             return Response(
                 {"error": "You don't have enough lunch credits"},
                 status=status.HTTP_400_BAD_REQUEST
@@ -97,6 +107,7 @@ class CreateFreeLunchAPIView(APIView):
         else:
             # Create a lunch request
             data['sender_id'] = user.id  # Set the sender_id
+            data["org_id"] = org_id_id
             serializer = LunchSerializer(data=data)
             
             if serializer.is_valid():
@@ -104,18 +115,11 @@ class CreateFreeLunchAPIView(APIView):
                 # Update the lunch credit balance for the user
                 organization = Organization.objects.filter(id=org_id_id).first()
                 organization_lunch_price = organization.lunch_price
-                if request.user.org_id.id == org_id_id:
-                    user.lunch_credit_balance = int(user.lunch_credit_balance) - (int(quantity)*organization_lunch_price)
-                    user.save()
                 
-                    # Create a lunch request
-                    serializer.save()
-                else:
-                    user.lunch_credit_balance = int(user.lunch_credit_balance) - (int(quantity)*100)
-                    user.save()
-                
-                    # Create a lunch request
-                    serializer.save()
+                user.lunch_credit_balance = int(user.lunch_credit_balance) - (int(quantity)*organization_lunch_price)
+                user.lunch_credit_balance = int(user.lunch_credit_balance)
+                user.save()
+                serializer.save()
                 
                 response = {
                     "message": "Lunch request created successfully",
@@ -137,12 +141,24 @@ class RetrieveLunchView(APIView):
 
     def get(self, request, id):
         try:
-
             lunch = Lunch.objects.get(pk=id)
-            if request.user.id == lunch.sender_id or request.user.id == lunch.receiver_id:
+            print(type(request.user.id), type(lunch.receiver_id))
+
+            # Check if the user is an admin
+            if request.user.is_staff:
                 serializer = LunchSerializer(lunch)
                 response = {
-                    "message": "successfully fetched lunches",
+                    "message": "Successfully fetched lunch",
+                    "statusCode": status.HTTP_200_OK,
+                    "data": serializer.data
+                }
+                return Response(response, status=status.HTTP_200_OK)
+
+            # Check if the user is either the sender or receiver of the lunch
+            elif request.user == (lunch.receiver_id or lunch.sender_id):
+                serializer = LunchSerializer(lunch)
+                response = {
+                    "message": "Successfully fetched lunch",
                     "statusCode": status.HTTP_200_OK,
                     "data": serializer.data
                 }
@@ -152,7 +168,7 @@ class RetrieveLunchView(APIView):
                 return Response(forbidden_response, status=status.HTTP_403_FORBIDDEN)
         except Lunch.DoesNotExist:
             return Response(
-                {"message": "Lunches not found"},
+                {"message": "Lunch not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -173,8 +189,6 @@ class ListAllLunchesView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 
-
-
 class UserRedeemLunch(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -193,20 +207,19 @@ class UserRedeemLunch(APIView):
             
             if not lunch.redeemed:
                 lunch.redeemed = True
+
+                if request.user.org_id_id is None:
+                    return Response(
+                        {"error": "Only user with an organization can redeem a lunch"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
                 
                 # Update the lunch credit balance for the user
                 organization = Organization.objects.filter(id=request.user.org_id.id).first()
                 organization_lunch_price = organization.lunch_price
-                if organization:
-                    user = User.objects.get(pk=request.user.id)
-                    user_lunch_wallet_balance = (int(lunch.quantity) * organization_lunch_price) + int(user.lunch_credit_balance)
-                    user.lunch_credit_balance = user_lunch_wallet_balance
-                
-        
-                else:
-                    user = User.objects.get(pk=request.user.id)
-                    user_lunch_wallet_balance = (int(lunch.quantity) * 100) + int(user.lunch_credit_balance)
-                    user.lunch_credit_balance = user_lunch_wallet_balance
+                user = User.objects.get(pk=request.user.id)
+                user_lunch_wallet_balance = (int(lunch.quantity) * organization_lunch_price) + int(user.lunch_credit_balance)
+                user.lunch_credit_balance = int(user_lunch_wallet_balance)
                 
                 # Save the changes to the lunch and user objects
                 lunch.save()
