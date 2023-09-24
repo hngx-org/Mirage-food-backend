@@ -9,13 +9,14 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 import os
 from decouple import config
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,12 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY",default="mydefaultvalue")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -47,10 +48,13 @@ INSTALLED_APPS = [
     "lunches",
     "organization",
     "rest_framework",
+    "rest_framework.authtoken",
+    "drf_yasg",
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = [   
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -84,18 +88,27 @@ WSGI_APPLICATION = "freelunch.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
+
+
+
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": config("DB_NAME"),
         "USER": config("DB_USER"),
         "PASSWORD": config("DB_PASSWORD"),
+        # "port":"3306",
+        # "HOST": config("DB_HOST")
     }
 }
 
-# pagination
+
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ]
 }
 
 # Password validation
@@ -116,11 +129,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'users.backends.CustomBackend',
-]
-
+# JWT_AUTH = {
+#     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),  # Token expiration time
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -139,32 +150,55 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-# MEDIA_URL = os.path.join(BASE_DIR, 'media/')
 
 # cloudinary config for profile picture upload
+
 cloudinary.config(
-    cloud_name=config("CLOUDINARY_CLOUD_NAME"),
-    api_key=config("CLOUDINARY_API_KEY"),
-    api_secret=config("CLOUDINARY_API_SECRET"),
+    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
+    api_key = config('CLOUDINARY_API_KEY'),
+    api_secret = config('CLOUDINARY_API_SECRET')
 )
-
-
-# MEDIA_URL = os.path.join(BASE_DIR, 'media/')
-
-# cloudinary config for profile picture upload
-# cloudinary.config(
-#     cloud_name = config('CLOUDINARY_CLOUD_NAME'),
-#     api_key = config('CLOUDINARY_API_KEY'),
-#     api_secret = config('CLOUDINARY_API_SECRET')
-# )
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'users.User'
+# AUTH_USER_MODEL = 'users.User'
+
 
 # For sending email
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Add authentication classes
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     ),
+#     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+#     "PAGE_SIZE": 10,
+# }
+
+"""REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'PAGE_SIZE': 10
+}"""
+
+
+# Set JWT authentication settings
+JWT_AUTH = {
+    'JWT_SECRET_KEY': 'your-secret-key',  # Replace with your secret key
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+}
+SWAGGER_SETTINGS={
+   
+    'api_version':'1.0',
+    'enabled_methods':['get','post','put','patch','delete'],
+}
+
