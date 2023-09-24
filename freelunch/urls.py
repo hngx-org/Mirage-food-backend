@@ -1,3 +1,21 @@
+
+from django.contrib import admin
+from django.urls import path, include
+
+from rest_framework.routers import DefaultRouter
+from organization.views import InvitationViewSet
+
+router = DefaultRouter()
+router.register(r'invitations', InvitationViewSet)
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+    path('users/', include(router.urls)),
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+
 """
 URL configuration for freelunch project.
 
@@ -36,29 +54,34 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
+
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("organization.urls")),
     path('api/', include('lunches.urls')),
-    path('api/',include('users.urls')),
 
-    path('api/', include('withdrawals.urls') ),
-        
-        re_path(
-            r'^swagger(?P<format>\.json|\.yaml)$',
-            schema_view.without_ui(cache_timeout=0),
-            name='schema-json',
-        ),
-        path(
-            'swagger/',
-            schema_view.with_ui('swagger', cache_timeout=0),
-            name='schema-swagger-ui',
-        ),
-        path(
-            'redoc/',
-            schema_view.with_ui('redoc', cache_timeout=0),
-            name='schema-redoc',
-        ),
+
+
+    # Add other URL patterns as needed
+
+    path('api/', include('withdrawals.urls')),
+    path('api/',include('users.urls')),        
+    re_path(
+        r'^swagger(?P<format>\.json|\.yaml)$',
+        schema_view.without_ui(cache_timeout=0),
+        name='schema-json',
+    ),
+    path(
+        'swagger/',
+        schema_view.with_ui('swagger', cache_timeout=0),
+        name='schema-swagger-ui',
+    ),
+    path(
+        'redoc/',
+        schema_view.with_ui('redoc', cache_timeout=0),
+        name='schema-redoc',
+    )
+
 ]

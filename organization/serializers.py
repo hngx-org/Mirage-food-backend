@@ -1,3 +1,4 @@
+from .models import  Invitation
 from rest_framework import serializers
 
 
@@ -9,13 +10,21 @@ from .models import (
         )
 
 
+from .models import OrganizationLunchWallet, Organization, OrganizationInvites
+
+
+class InvitationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invitation
+        fields = '__all__'
+
 class OrganizationLunchWalletSerializer(serializers.ModelSerializer):
     """
-    Serializer for organization lunch model
+    Serializer for organization lunch wallet model
     """
     class Meta:
         model = OrganizationLunchWallet
-        fields = ['balance', 'org_id']
+        fields = ['balance', 'organization']
 
 
 class ListInvitesSerializer(serializers.ModelSerializer):
@@ -41,3 +50,13 @@ class OrganizationLunchPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrganizationLunchPrice
         fields = ['lunch_price']
+
+
+#organizationwalletupdate changes
+class OrganizationLunchWalletUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for organization lunch wallet model
+    """
+    class Meta:
+        model = OrganizationLunchWallet
+        fields = ['balance']
