@@ -265,3 +265,56 @@ HTTP/1.1  403 Forbidden
    "error": User not authorized to create an organization invite.",  
   }
 ```
+
+### Withdrawal Status Update (Redeemed || Not redeemed)
+### Endpoint
+URL:   api/withdrawals/<int:pk>/
+
+### Method: PUT | PATCH
+
+### Description:
+This API endpoint is used to update the status of the withdrawal to either Redeemed or not redeemed.
+Parameters:
+<int:pk>:  The primary key (ID) which stands for id of the user
+
+### PUT request
+
+```bash
+PUT /api/withdrawals/1/`
+Content-Type: application/json
+{
+    "status": 'Redeemed',
+    "amount": 500.00,
+    "user_id": 'example'
+}
+```
+
+**Example response(success)**
+
+Withdrawal Status updated successfully
+
+status: status.HTTP_200_OK
+
+**Example Error responses:**
+
+Bad request or invalid data:
+
+### PATCH request
+
+```bash
+PATCH /api/withdrawals/1/
+Content-Type: application/json
+{
+   "status": 'Not Redeemed'
+}
+```
+
+**Example response(success)**
+
+Withdrawal Status updated successfully
+
+status: status.HTTP_200_OK
+
+**Example Error responses:**
+
+Bad request or invalid data:
