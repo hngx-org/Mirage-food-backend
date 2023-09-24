@@ -5,7 +5,7 @@ from .models import Organization, OrganizationLunchWallet, OrganizationInvites
 from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
-from .serializers import OrganizationSerializer, OrganizationInviteSerializer
+from .serializers import OrganizationSerializer, OrganizationInviteSerializer, OrganizationLunchWalletSerializer
 from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
 import secrets
@@ -176,16 +176,112 @@ class StaffConfirmTokenAndSignUpView(APIView):
         return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
 
     
-# class OrganizationLunchWalletView(APIView):
-#     def post(self, request):
-#         serializer = OrganizationLunchWalletSerializer(data=request.data)
+class OrganizationLunchWalletView(APIView):
+    permission_classes = [IsAdmin]
 
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=HTTP_201_CREATED)
-#         else:
-#             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-# # Create your views here.
+    def post(self, request):
+        org_id = request.user.org_id.id
+        lunch_wallet = OrganizationLunchWallet.objects.filter(org_id=org_id).first()
+        if not lunch_wallet:
+            data = request.data
+            data["org_id"] = org_id
+            serializer = OrganizationLunchWalletSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                response = {
+                    "status": "success",
+                    "message": "Organization lunch wallet created successfully",
+                    "data": serializer.data,
+                }
+                return Response(response, status=status.HTTP_201_CREATED)
+            else:
+                bad_response = {
+                    "status": "error",
+                    "message": "Bad request",
+                    "data": serializer.errors,
+                }
+                return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            bad_response = {
+                "status": "error",
+                "message": "Organization lunch wallet already exists",
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    def patch(self, request):
+        org_id = request.user.org_id.id
+        lunch_wallet = OrganizationLunchWallet.objects.filter(org_id=org_id).first()
+        if not lunch_wallet:
+            bad_response = {
+                "status": "error",
+                "message": "Organization lunch wallet not found",
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = OrganizationLunchWalletSerializer(lunch_wallet, data=request.data, partial=True)
+        if serializer.is_valid():
+            new_balance = float(lunch_wallet.balance) + float(request.data.get("balance", 0))
+            lunch_wallet.balance = new_balance
+            lunch_wallet.save()
+            
+            response = {
+                "status": "success",
+                "message": "Organization lunch wallet updated successfully",
+                "data": serializer.data,
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            bad_response = {
+                "status": "error",
+                "message": "Bad request",
+                "data": serializer.errors,
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class UpdateOrganizationLunchPriceView(APIView):
+    permission_classes = [IsAdmin]
+
+    def patch(self, request):
+        org_id = request.user.org_id.id
+        organization = Organization.objects.filter(id=org_id).first()
+        if not organization:
+            bad_response = {
+                "status": "error",
+                "message": "Organization not found",
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = OrganizationSerializer(organization, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            
+            response = {
+                "status": "success",
+                "message": "Organization lunch price updated successfully",
+                "data": serializer.data,
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            bad_response = {
+                "status": "error",
+                "message": "Bad request",
+                "data": serializer.errors,
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
+
 
 
 # class ListInvitesView(APIView):
