@@ -5,7 +5,7 @@ from django.urls import path
 from .views import UserListViewSet, LoginView
 from lunches.views import LunchDetailView
 from .views import SearchUserView
-from .views import UserRegistrationView
+from .views import UserRegistrationView, UserDetailView
 from .views import LogoutView
 
 from rest_framework_simplejwt.views import (
