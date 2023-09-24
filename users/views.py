@@ -1,6 +1,5 @@
 from rest_framework.response import Response
-from .serializers import UserRegistrationSerializer,UserListSerializer
-from .models import User
+from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -9,15 +8,22 @@ from rest_framework.permissions import AllowAny , IsAuthenticated
 from django.contrib.auth import authenticate, login
 
 
-from .serializers import SearchedUserSerializer
-from django.http import Http404
+from .models import User
+from .serializers import (
+    UserRegistrationSerializer,
+    UserListSerializer,
+    SearchedUserSerializer,
+    UserDetailsSerializer,
+)
+from . import workers
+
 
 # Create your views here.
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
-    # Get username and password from the request
-        email = request.data.get('email')
-        password = request.data.get('password')
+        # Get username and password from the request
+        email = request.data.get("email")
+        password = request.data.get("password")
 
         # Authenticate the user
         user = authenticate(request, email=email, password=password)
@@ -37,7 +43,9 @@ class LoginView(APIView):
  
             return Response(response_data, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
 
 # class DeleteUserView(APIView):
@@ -83,6 +91,8 @@ class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
+
+
 class UserListViewSet(APIView):
     def get(self, request, *args, **kwargs):
         """
@@ -91,17 +101,20 @@ class UserListViewSet(APIView):
         queryset = User.objects.all()
         serializer = UserListSerializer(queryset, many=True)
 
-        return Response({
-            "message": "successfully fetched users",
-            "statusCode": status.HTTP_200_OK,
-            "data": serializer.data
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "message": "successfully fetched users",
+                "statusCode": status.HTTP_200_OK,
+                "data": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class SearchUserView(APIView):
     "Api view accepting either a name (first or last) or email parameter to search for a user"
 
-    def get_object(self, param:str):
+    def get_object(self, param: str):
         try:
             return User.objects.get(first_name=param)
         except User.DoesNotExist:
@@ -113,12 +126,33 @@ class SearchUserView(APIView):
                 except User.DoesNotExist:
                     raise Http404
 
-    def get(self, request, name_or_email:str, *args, **kwargs):
+    def get(self, request, name_or_email: str, *args, **kwargs):
         instance = self.get_object(name_or_email)
         serializer = SearchedUserSerializer(instance)
-        return Response({
-            'message': 'User Found',
-            'statusCode': status.HTTP_200_OK,
-            'data': serializer.data
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "message": "User Found",
+                "statusCode": status.HTTP_200_OK,
+                "data": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
 
+
+class UserDetailView(APIView):
+    def get(self, request):
+        """
+        Get user details
+        """
+        user = request.user
+        user_details = workers.UserWorker.get_user_details(user.id)
+        serializer = UserDetailsSerializer(user_details)
+        return Response(
+            {
+                "message": "User data fetched",
+                "statusCode": status.HTTP_200_OK,
+                "data": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+            message="User data fetched",
+        )
