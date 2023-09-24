@@ -48,10 +48,12 @@ INSTALLED_APPS = [
     "organization",
     "rest_framework",
     "drf_yasg",
-    ]
+    "whitenoise.runserver_nostatic",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -85,13 +87,13 @@ WSGI_APPLICATION = "freelunch.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mirage',
-        'USER': 'mirage',
-        'PASSWORD': 'mirage-098123',
-        'HOST': 'teammirrage-db.cpgeqjtedh92.us-east-1.rds.amazonaws.com',
-        'PORT': '3306',
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "mirage",
+        "USER": "mirage",
+        "PASSWORD": "mirage-098123",
+        "HOST": "teammirrage-db.cpgeqjtedh92.us-east-1.rds.amazonaws.com",
+        "PORT": "3306",
     }
 }
 
@@ -133,32 +135,29 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
 
 
 SIMPLE_JWT = {
-  # It will work instead of the default serializer(TokenObtainPairSerializer).
-   # "TOKEN_OBTAIN_SERIALIZER": "authentication_app.serializers.CustomTokenObtainPairSerializer",
+    # It will work instead of the default serializer(TokenObtainPairSerializer).
+    # "TOKEN_OBTAIN_SERIALIZER": "authentication_app.serializers.CustomTokenObtainPairSerializer",
     "ACCESS_TOKEN_LIFETIME": timedelta(days=2),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
-
-  # ...
+    # ...
 }
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'users.backends.CustomBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "users.backends.CustomBackend",
 ]
 
 # Internationalization
@@ -176,14 +175,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = os.path.join(BASE_DIR, "static/")
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles/")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 # cloudinary config for profile picture upload
 cloudinary.config(
-    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
-    api_key = config('CLOUDINARY_API_KEY'),
-    api_secret = config('CLOUDINARY_API_SECRET')
+    cloud_name=config("CLOUDINARY_CLOUD_NAME"),
+    api_key=config("CLOUDINARY_API_KEY"),
+    api_secret=config("CLOUDINARY_API_SECRET"),
 )
 
 # cloudinary.config(
@@ -197,15 +200,15 @@ cloudinary.config(
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = "users.User"
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'abiolaadedayo1993@gmail.com'
-EMAIL_HOST_PASSWORD = 'yshaddajfbbbdixc'
+EMAIL_HOST_USER = "abiolaadedayo1993@gmail.com"
+EMAIL_HOST_PASSWORD = "yshaddajfbbbdixc"
 
 SWAGGER_SETTINGS = {
     "USE_SESSION_AUTH": False,  # Disable session authentication
