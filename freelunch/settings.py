@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "users",
     "withdrawals",
     "lunches",
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -158,6 +160,31 @@ SIMPLE_JWT = {
   # ...
 }
 
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWS_ORIGINS = [
+ 
+    "https://mirage-backend.onrender.com/",
+    "http:127.0.0.1:8000/"
+]
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+]
+
+CORS_ALLOW_HEADERS = [
+    "Accept",
+    "Content-Type",
+    "Authorization",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'users.backends.CustomBackend',
@@ -214,11 +241,27 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'abiolaadedayo1993@gmail.com'
 EMAIL_HOST_PASSWORD = 'yshaddajfbbbdixc'
 
+# SWAGGER_SETTINGS = {
+#     # "USE_SESSION_AUTH": False,  # Disable session authentication
+#     "SECURITY_DEFINITIONS": {
+#         "Bearer": {
+#             "type": "apiKey",
+#             "name": "Authorization",
+#             "in": "header"
+#         },
+#     },
+# }
+
 SWAGGER_SETTINGS = {
-    "USE_SESSION_AUTH": False,  # Disable session authentication
-    "SECURITY_DEFINITIONS": {
-        "basic": {
-            "type": "basic",
-        },
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+        }
     },
+    'APIS_SORTER': 'alpha',
+    'SHOW_REQUEST_HEADERS': True,
+    'JSON_EDITOR': True,
 }
