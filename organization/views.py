@@ -44,21 +44,10 @@ from .serializers import ListInvitesSerializer
 from .permissions import OrganisationAdmin
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-from .models import(
-        Organization,
-        OrganizationLunchWallet,
-        OrganizationInvites,
-        OrganizationLunchPrice
-        )
+from .models import Organization, OrganizationLunchWallet, OrganizationInvites
 from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
-<<<<<<< HEAD
-from .serializers import(
-        OrganizationSerializer,
-        OrganizationLunchPriceSerializer
-        )
-from rest_framework.decorators import api_view
 from .serializers import OrganizationSerializer
 from rest_framework.views import APIView
 # from rest_framework.decorators import api_view
@@ -87,13 +76,9 @@ from .serializers import OrganizationLunchWalletUpdateSerializer
 from rest_framework.decorators import api_view
 
 
-<<<<<<< HEAD
-class OrganizationLunchWalletView(APIView):
-=======
 
 class OrganizationView(APIView):
     permission_classes = [ IsAdmin,]
->>>>>>> 180d01ac0945fe0739cc74b9f05870bbd243500b
     @swagger_auto_schema(
            
             operation_summary="Allows an admin to create an organization",
@@ -146,6 +131,7 @@ class OrganizationLunchWalletView(APIView):
             return Response(serializer.data, status=HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+# Create your views here.
 
 
 class ListInvitesView(APIView):
@@ -230,8 +216,6 @@ class DeleteOrganizationView(APIView):
             }
     )
 
-<<<<<<< HEAD
-=======
 
     def delete(request, org_id):
         organization = Organization.object.get(pk=org_id)
@@ -293,29 +277,4 @@ class OrganizationWalletUpdateView(generics.UpdateAPIView,):
 
 
    
->>>>>>> 180d01ac0945fe0739cc74b9f05870bbd243500b
 
-class OrganizationLunchPriceViewSet(viewsets.ModelViewSet):
-    """
-    if user is an admin, they can update lunch prices
-    """
-    queryset = OrganizationLunchPrice.objects.all()
-    serializer_class = OrganizationLunchPriceSerializer
-
-    permission_classes = [OrganisationAdmin]
-
-    @action(detail=False, methods=['patch'])
-    def update_lunch_price(self, request):
-        try:
-            new_price = request.data['lunch_price']
-
-            org_lunch = OrganizationLunchPrice.objects.first()
-            org_lunch.lunch_price = new_price
-            org_lunch.save()
-
-            return Response({'message': 'success'}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response(
-                    {'error': 'User not found'},
-                    status=status.HTTP_404_NOT_FOUND
-                    )
