@@ -1,17 +1,113 @@
 from rest_framework.response import Response
-from .serializers import UserRegistrationSerializer,UserListSerializer, UserAddBankAccountSerializer
+from .serializers import UserRegistrationSerializer,UserListSerializer, UserAddBankAccountSerializer, UserUpdateSerializer,UserProfilePictureSerializer
 from .models import User
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework import generics
 from rest_framework.permissions import AllowAny , IsAuthenticated, IsAdminUser
 from django.contrib.auth import authenticate, login
 
-from .serializers import SearchedUserSerializer
+from .serializers import SearchedUserSerializer, ChangePasswordSerializer
 from django.http import Http404
 
-# Create your views here.
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import update_session_auth_hash
+from rest_framework.decorators import api_view, permission_classes
+
+from rest_framework import generics, status, viewsets, response
+
+
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.core.mail import send_mail
+
+from . import serializers
+
+
+class PasswordReset(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+    """
+    Request for Password Reset Link.
+    """
+
+    serializer_class = serializers.EmailSerializer
+
+    def post(self, request):
+        """
+        Create token.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.data["email"]
+        user = User.objects.filter(email=email).first()
+        if user:
+            encoded_pk = urlsafe_base64_encode(force_bytes(user.pk))
+            token = PasswordResetTokenGenerator().make_token(user)
+            reset_url = reverse(
+                "reset-password",
+                kwargs={"encoded_pk": encoded_pk, "token": token},
+            )
+            reset_link = f"https://mirage-backend.onrender.com/api/{reset_url}"
+
+
+            # Send the reset link as an email to the user
+            subject = "Password Reset Link"
+            message = f"Click the following link to reset your password: {reset_link}"
+            from_email = "abiolaadedayo1993@gmail.com"  
+            recipient_list = [email]
+
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
+            return response.Response(
+                {"message": "Password reset link sent to your email"},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return response.Response(
+                {"message": "User doesn't exist"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class ResetPasswordAPI(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+    """
+    Verify and Reset Password Token View.
+    """
+
+    serializer_class = serializers.ResetPasswordSerializer
+
+    def patch(self, request, *args, **kwargs):
+        """
+        Verify token & encoded_pk and then reset the password.
+        """
+        serializer = self.serializer_class(
+            data=request.data, context={"kwargs": kwargs}
+        )
+        serializer.is_valid(raise_exception=True)
+        return response.Response(
+            {"message": "Password reset complete"},
+            status=status.HTTP_200_OK,
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_password(request):
+    if request.method == 'POST':
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            if user.check_password(serializer.data.get('old_password')):
+                user.set_password(serializer.data.get('new_password'))
+                user.save()
+                update_session_auth_hash(request, user)  # To update session after password change
+                return Response({'message': 'Password changed successfully.'}, status=status.HTTP_200_OK)
+            return Response({'error': 'Incorrect old password.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ApiStatusView(APIView):
@@ -111,17 +207,6 @@ class RetrieveDeleteUserView(APIView):
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-
-
-
-
-
-
-# class UserRegistrationView(generics.CreateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserRegistrationSerializer
-#     permission_classes = [AllowAny]
-
 class UserRegistrationView(APIView):
     permission_classes = [
         AllowAny
@@ -193,3 +278,31 @@ class SearchUserView(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
+
+
+
+class UserUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserUpdateSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class UserProfilePictureUpdateView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserProfilePictureSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)

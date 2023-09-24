@@ -1,8 +1,79 @@
 from .models import User
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import make_password
+# accounts/serializers.py
+
+from rest_framework import serializers
+from rest_framework import serializers
+
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_decode
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'phone', 'bank_number', 'bank_code', 'bank_name', 'lunch_credit_balance']
+
+
+class UserProfilePictureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['profile_pic']
+
+
+
+
+class EmailSerializer(serializers.Serializer):
+    """
+    Reset Password Email Request Serializer.
+    """
+
+    email = serializers.EmailField()
+
+    class Meta:
+        fields = ("email",)
+
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    """
+    Reset Password Serializer.
+    """
+
+    password = serializers.CharField(
+        write_only=True,
+        min_length=1,
+    )
+
+    class Meta:
+        field = ("password")
+
+    def validate(self, data):
+        """
+        Verify token and encoded_pk and then set new password.
+        """
+        password = data.get("password")
+        token = self.context.get("kwargs").get("token")
+        encoded_pk = self.context.get("kwargs").get("encoded_pk")
+
+        if token is None or encoded_pk is None:
+            raise serializers.ValidationError("Missing data.")
+
+        pk = urlsafe_base64_decode(encoded_pk).decode()
+        user = User.objects.get(pk=pk)
+        if not PasswordResetTokenGenerator().check_token(user, token):
+            raise serializers.ValidationError("The reset token is invalid")
+
+        user.set_password(password)
+        user.save()
+        return data
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
 
 
 class UserListSerializer(serializers.ModelSerializer):

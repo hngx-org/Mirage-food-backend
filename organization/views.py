@@ -65,7 +65,7 @@ class CreateOrganizationInviteView(APIView):
 
             # Send email to the invitee
             subject = 'Invitation to join Mirage Free Lunch App'
-            message = 'This is your invitation token.'
+            message = 'This is Invitation Link To Mirage Lunch App.'
             from_email = 'abiolaadedayo1993@gmail.com'
             recipient_list = [invite.email]
             token = invite.token  # Access the token from the saved instance
@@ -275,7 +275,6 @@ class UpdateOrganizationLunchPriceView(APIView):
                 "data": serializer.errors,
             }
             return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 
