@@ -12,15 +12,16 @@ from .serializers import OrganizationSerializer
 from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
-
 from .models import Organization
 from users.permissions import IsAdmin
 from . import workers
-
 from rest_framework.views import APIView
 from .serializers import OrganizationLunchWalletSerializer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAdminUser
 
 class OrganizationView(APIView):
     permission_classes = [
@@ -116,3 +117,41 @@ class OrganizationInviteView(APIView):
             return Response({"message": "Invite sent"}, status=status.HTTP_201_CREATED)
         return Response({"message": "Invite failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+class UpdateWalletAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+    def patch(self, request, **kwargs):
+        balance = request.data.get('balance')
+        user = request.user
+        org_id = user.org_id
+
+        try:
+            # Retrieve the organization's lunch wallet based on the organization ID
+            lunch_wallet = OrganizationLunchWallet.objects.get(org_id=org_id)
+
+            # Update the balance
+            lunch_wallet.balance = balance
+            lunch_wallet.save()
+
+            # Serialize the updated wallet data
+            serialized_data = OrganizationLunchWalletSerializer(lunch_wallet).data
+
+            return Response({
+                "message": "success",
+                "statusCode": status.HTTP_200_OK,
+                "data": serialized_data
+            })
+
+        except OrganizationLunchWallet.DoesNotExist:
+            return Response({
+                "message": "Organization lunch wallet not found",
+                "statusCode": status.HTTP_404_NOT_FOUND
+            })
+
+        except Exception as e:
+            return Response({
+                "message": "An error occurred while updating the wallet",
+                "statusCode": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "error": str(e)
+            })
+
