@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+import secrets
 
 class Organization(models.Model):
     name = models.CharField(max_length=255, blank=False, null=False)
@@ -30,6 +31,7 @@ class OrganizationLunchWallet(models.Model):
 
 class OrganizationInvites(models.Model):
     """Model for Organization Invites """
+
     org_id = models.ForeignKey(Organization, on_delete=models.CASCADE)
     email = models.EmailField()
     token = models.CharField(max_length=20, null=False)
