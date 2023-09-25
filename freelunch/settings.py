@@ -86,8 +86,12 @@ WSGI_APPLICATION = "freelunch.wsgi.application"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mirage',
+        'USER': 'mirage',
+        'PASSWORD': 'mirage-098123',
+        'HOST': 'teammirrage-db.cpgeqjtedh92.us-east-1.rds.amazonaws.com',
+        'PORT': '3306',
     }
 }
 
@@ -176,11 +180,11 @@ STATIC_URL = "static/"
 
 
 # cloudinary config for profile picture upload
-# cloudinary.config(
-#     cloud_name=config('CLOUDINARY_CLOUD_NAME'),
-#     api_key=config('CLOUDINARY_API_KEY'),
-#     api_secret=config('CLOUDINARY_API_SECRET')
-# )
+cloudinary.config(
+    cloud_name=config('CLOUDINARY_CLOUD_NAME'),
+    api_key=config('CLOUDINARY_API_KEY'),
+    api_secret=config('CLOUDINARY_API_SECRET')
+)
 
 # cloudinary.config(
 #     cloud_name=os.environ['CLOUDINARY_CLOUD_NAME'],

@@ -40,7 +40,7 @@ urlpatterns = [
          ConfirmResetTokenView.as_view(), name='confirm-password-reset'),
     path('user/password-reset/<str:token>',
          PasswordResetView.as_view(), name='password-reset'),
-    path('user/redeem', RedeemLunchView.as_view(), name='redeem-lunch'), s
+    path('user/redeem', RedeemLunchView.as_view(), name='redeem-lunch'),
 
 
     # path('auth/login', TokenObtainPairView.as_view(), name='login'),
