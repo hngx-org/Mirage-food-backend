@@ -86,12 +86,8 @@ WSGI_APPLICATION = "freelunch.wsgi.application"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mirage',
-        'USER': 'mirage',
-        'PASSWORD': 'mirage-098123',
-        'HOST': 'teammirrage-db.cpgeqjtedh92.us-east-1.rds.amazonaws.com',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
