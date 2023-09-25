@@ -48,3 +48,9 @@ class UserDetailsSerializer(serializers.Serializer):
 
 class RedeemLunchSerializer(serializers.Serializer):
     ids = serializers.ListField(child=serializers.IntegerField())
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'phone', 'profile_pic']
