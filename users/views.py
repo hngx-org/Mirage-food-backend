@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework import generics
-from rest_framework.permissions import AllowAny , IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate, login
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -15,6 +15,8 @@ from .serializers import (
     UserListSerializer,
     SearchedUserSerializer,
     UserDetailsSerializer,
+    RedeemLunchSerializer,
+
 )
 from . import workers
 
@@ -22,9 +24,13 @@ from . import workers
 from django.urls import reverse
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import smtplib, os, ssl
+import smtplib
+import os
+import ssl
 
 # Create your views here.
+
+
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
         # Get username and password from the request
@@ -45,8 +51,8 @@ class LoginView(APIView):
                 "email": user.email,
                 "id": user.id,
                 "isAdmin": user.is_staff  # Assuming 'is_staff' signifies admin status
-                }
- 
+            }
+
             return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response(
@@ -65,15 +71,16 @@ class LogoutView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        refresh_token = request.data.get('refresh_token') or request.data.get('refresh')
+        refresh_token = request.data.get(
+            'refresh_token') or request.data.get('refresh')
         if not refresh_token:
-            return Response({'error':'Request token not provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Request token not provided'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response({'message':'User Successfully logged out'}, status=status.HTTP_200_OK)
+            return Response({'message': 'User Successfully logged out'}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 # class DeleteUserView(APIView):
 
@@ -90,6 +97,7 @@ class LogoutView(APIView):
 #         user.delete()
 #         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
 
+
 class DeleteUserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -105,13 +113,9 @@ class DeleteUserView(APIView):
             return Response(response, status=status.HTTP_204_NO_CONTENT)
         except User.DoesNotExist:
             error_response = {
-                "status": "error","message": "User does not exist",
+                "status": "error", "message": "User does not exist",
             }
             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
-
-
-
-
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -166,8 +170,6 @@ class SearchUserView(APIView):
         )
 
 
-
-
 class RequestPasswordResetView(generics.GenericAPIView):
     """
     View that sends the user an email providing them with the reset token
@@ -197,17 +199,17 @@ Stay Kind :)""", 'html'))
             smtp.login(self.from_email, self.from_passwd)
             smtp.sendmail(self.from_email, to_email, em.as_string())
 
-        return True 
+        return True
 
     # this view sends an email to a user providing them with the reset token
-    # associated with their 
+    # associated with their
     def get(self, request, *args, **kwargs):
         user = self.get_object()
         new_token = User.generate_reset_token(5)
         user.password_reset_token = new_token
         user.save()
         self.send_email(kwargs['email'], new_token)
-        return Response({'message':'Email successfully sent!'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Email successfully sent!'}, status=status.HTTP_200_OK)
 
 
 class ConfirmResetTokenView(generics.GenericAPIView):
@@ -221,8 +223,8 @@ class ConfirmResetTokenView(generics.GenericAPIView):
     def get(self, request, token, *args, **kwargs):
         user = self.get_object()
         if user.password_reset_token == token:
-            return Response({'message':'Token Authorized'}, status=status.HTTP_200_OK)
-        return Response({'message':'Invalid token!'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'message': 'Token Authorized'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Invalid token!'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class PasswordResetView(generics.GenericAPIView):
@@ -235,14 +237,16 @@ class PasswordResetView(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         user = self.get_object()
-        passwd1, passwd2 = request.data.get('password1'), request.data.get('password2')
+        passwd1, passwd2 = request.data.get(
+            'password1'), request.data.get('password2')
         if passwd1 != passwd2:
-            return Response({'message':"Passwords do not match!"}, status=status.HTTP_400_BAD_REQUEST) 
+            return Response({'message': "Passwords do not match!"}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(passwd1)
         # generate a fresh token for the user
         user.password_reset_token = User.generate_reset_token(5)
         user.save()
-        return Response({'message':'Password reset successfully :)'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Password reset successfully :)'}, status=status.HTTP_200_OK)
+
 
 class UserDetailView(APIView):
     def get(self, request):
@@ -262,3 +266,31 @@ class UserDetailView(APIView):
             message="User data fetched",
         )
 
+
+class RedeemLunchView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = RedeemLunchSerializer(data=request.data)
+        if serializer.is_valid():
+            # Get the list of user IDs from the serializer
+            user_ids = serializer.validated_data.get('ids')
+
+            # Assuming you have a function to handle lunch credit redemption in your User model
+            for user_id in user_ids:
+                user = User.objects.get(pk=user_id)
+                user.redeem_lunch_credit()  # Implement this method in your User model
+
+            return Response(
+                {
+                    "message": "success",
+                    "statusCode": status.HTTP_200_OK,
+                    "data": None
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )

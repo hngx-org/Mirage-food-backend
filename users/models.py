@@ -70,6 +70,10 @@ class User(PermissionsMixin, AbstractBaseUser):
     # password_reset_token = models.CharField(
     #     max_length=5, default=generate_reset_token(5), editable=False)
 
+    for user_id in user_ids:
+        user = User.objects.get(pk=user_id)
+        user.redeem_lunch_credit()  # Implement this method in your User model
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
     objects = UserManager()
