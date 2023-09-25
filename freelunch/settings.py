@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "whitenoise.runserver_nostatic",
     "django_rest_passwordreset",
+    "rest_framework_simplejwt.token_blacklist",
     ]
 
 MIDDLEWARE = [
