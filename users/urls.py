@@ -1,5 +1,4 @@
 from django.urls import path
-from .views import LoginView
 from .views import(
     DeleteUserView,
     UserProfileView,
@@ -7,14 +6,15 @@ from .views import(
     UserProfileUpdateView,
     UserProfilePictureUpdateView)
 from django.urls import path
-from .views import UserListViewSet, LoginView
+from .views import UserListViewSet
 
 from .views import SearchUserView
-from .views import UserRegistrationView
+from .views import UserRegistrationView, UserLoginView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+
 
 
 urlpatterns = [
@@ -24,7 +24,7 @@ urlpatterns = [
     path('users/<int:id>', DeleteUserView.as_view()),
     path('user/search/<str:name_or_email>', SearchUserView.as_view(), name='search-users'),
     path('auth/user/signup', UserRegistrationView.as_view(), name='user-signup'),
-    path('auth/login', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/login', UserLoginView.as_view(), name='user-login'),
     path('users/<int:pk>', UserProfileUpdateView.as_view(), name='user-update'),
     path('update-profile-picture/<int:pk>', UserProfilePictureUpdateView.as_view(), name='update-profile-picture'),
 

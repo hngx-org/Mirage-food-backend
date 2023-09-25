@@ -13,37 +13,40 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from django.contrib.auth import authenticate, login
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 
 
 from .serializers import SearchedUserSerializer
 from django.http import Http404
 
 # Create your views here.
-class LoginView(APIView):
+class UserLoginView(TokenObtainPairView):
+    permission_classes = [AllowAny]
+    @swagger_auto_schema(
+        operation_summary="Login a user",
+        responses={
+            200: "successfully logged in",
+            400: 'Bad Request'},
+    )
+
     def post(self, request, *args, **kwargs):
-    # Get username and password from the request
-        email = request.data.get('email')
-        password = request.data.get('password')
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            user = User.objects.get(email=request.data['email'])
 
-        # Authenticate the user
-        user = authenticate(request, email=email, password=password)
-
-        if user is not None:
-            # If authentication is successful, create or retrieve a token
-            token, created = Token.objects.get_or_create(user=user)
-            login(request, user)  # Optional: Log the user in
-            response_data = {
-                "message": "User authenticated successfully",
-                "statusCode": status.HTTP_200_OK,
-                "access_token": token.key,
-                "email": user.email,
+            user_profile_data = {
                 "id": user.id,
-                "isAdmin": user.is_staff  # Assuming 'is_staff' signifies admin status
-                }
- 
-            return Response(response_data, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "phone": user.phone,
+                "organization_id": user.org_id.id,
+                "lunch_credit_balance": user.lunch_credit_balance,
+            }
+            response.data["data"] = user_profile_data
+        return response
+
+
 
 
 class DeleteUserView(APIView):
