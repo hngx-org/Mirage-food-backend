@@ -4,6 +4,19 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 
 
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'password', 'first_name', 'last_name', )
+        extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
+
+    def create(self, validated_data):
+        user = CustomUser.objects.create_user(**validated_data)
+        return user
+        user = User.objects.create_user(**validated_data)
+        return user
+
+
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

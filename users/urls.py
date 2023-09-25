@@ -1,12 +1,6 @@
 from django.urls import path
-from .views import LoginView
-from .views import DeleteUserView
-from django.urls import path
-from .views import UserListViewSet, LoginView
+from .views import UserListViewSet, DeleteUserView, UserRegistrationView, LoginView, SearchUserView, UserDetailView
 from lunches.views import LunchDetailView
-from .views import SearchUserView
-from .views import UserRegistrationView, UserDetailView
-
 
 urlpatterns = [
     path("users/all", UserListViewSet.as_view(), name="users-list"),
@@ -21,3 +15,4 @@ urlpatterns = [
     path("users/login/", LoginView.as_view(), name="login"),
     path("user/profile/<int:user_id>/", UserDetailView.as_view(), name="user-profile"),
 ]
+
