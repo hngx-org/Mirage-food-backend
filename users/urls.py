@@ -12,7 +12,9 @@ from .views import LogoutView
 from .views import (
     RequestPasswordResetView,
     ConfirmResetTokenView,
-    PasswordResetView)
+    PasswordResetView,
+    RedeemLunchView
+)
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
