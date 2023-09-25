@@ -5,9 +5,17 @@ from rest_framework.permissions import IsAuthenticated
 from users.models import User
 from .models import Withdrawal
 from .serializers import WithdrawalRequestSerializer
+from drf_yasg.utils import swagger_auto_schema
+
+
 
 class LunchWithdrawalCreateView(APIView):
     permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        operation_summary="Request a withdrawal",
+        request_body=WithdrawalRequestSerializer,
+        responses={201: 'Created', 400: 'Bad Request'},
+    )
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -29,7 +37,6 @@ class LunchWithdrawalCreateView(APIView):
                 return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
             
             if user.bank_name != bank_name or user.bank_number != bank_number:
-                print(bank_name, bank_number)
                 response = {
                     "message": "User bank account or bank name not correct"
                 }

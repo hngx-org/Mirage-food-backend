@@ -8,10 +8,18 @@ from organization.models import Organization, OrganizationLunchWallet
 from .models import Lunch
 from .serializers import LunchSerializer
 from django.db.models import Q
+from drf_yasg.utils import swagger_auto_schema
 
 
 class CreateOrganizationFreeLunchApiView(APIView):
     permission_classes = [IsAdminUser]
+    
+    @swagger_auto_schema(
+        operation_summary="Organization admin can send free lunch to any user in the organization",
+        request_body=LunchSerializer,
+        responses={201: 'lunch request created successfully',
+                    400: 'Bad Request'}
+    )
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -69,6 +77,13 @@ class CreateOrganizationFreeLunchApiView(APIView):
 
 class CreateFreeLunchAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Any user can send free lunch to any user in the organization",
+        request_body=LunchSerializer,
+        responses={201: 'lunch request created successfully',
+                    400: 'Bad Request'}
+    )
 
     def post(self, request, *args, **kwargs):
 
@@ -139,11 +154,17 @@ class CreateFreeLunchAPIView(APIView):
 class RetrieveLunchView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="Get a lunch request by id",
+        
+        responses={200: 'successfully fetched lunch',
+                    400: 'Bad Request',
+                    403: 'Forbidden',}
+    )
+
     def get(self, request, id):
         try:
             lunch = Lunch.objects.get(pk=id)
-            print(type(request.user.id), type(lunch.receiver_id))
-
             # Check if the user is an admin
             if request.user.is_staff:
                 serializer = LunchSerializer(lunch)
@@ -176,10 +197,20 @@ class RetrieveLunchView(APIView):
 class ListAllLunchesView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="User can get all lunches sent or received by them",
+        responses={200: 'successfully fetched lunches',
+                    400: 'Bad Request'}
+    )
+
     def get(self, request):
         
-        user = request.user
-        lunches = Lunch.objects.filter(Q(sender_id=user.id) | Q(receiver_id=user.id)).all()
+        user_id = request.user.id
+        
+        lunches = Lunch.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id)).all()
+        # lunches = Lunch.objects.all()
+        
+       
         serializer = LunchSerializer(lunches, many=True)
         response = {
                 "message": "successfully fetched lunches",

@@ -1,5 +1,9 @@
 from rest_framework.response import Response
-from .serializers import UserRegistrationSerializer,UserListSerializer,UserAddBankAccountSerializer
+from .serializers import (
+    UserRegistrationSerializer,
+    UserListSerializer,
+    UserAddBankAccountSerializer,
+    UserUpdateSerializer, UserProfilePictureSerializer)
 from .models import User
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -8,6 +12,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from django.contrib.auth import authenticate, login
+from drf_yasg.utils import swagger_auto_schema
 
 
 from .serializers import SearchedUserSerializer
@@ -68,13 +73,66 @@ class UserProfileView(APIView):
     def get(self, request, id):
         try:
             user = User.objects.get(pk=id)
-            serializer = UserListSerializer(user)
+            if request.user.is_staff:
+                serializer = UserListSerializer(user)
+                response = {
+                    "status": "success",
+                    "message": "User retrieved successfully",
+                    "data": serializer.data
+                }
+                return Response(response, status=status.HTTP_200_OK)
+            if user == request.user:
+                serializer = UserListSerializer(user)
+                response = {
+                    "status": "success",
+                    "message": "User retrieved successfully",
+                    "data": serializer.data
+                }
+                return Response(response, status=status.HTTP_200_OK) 
+            else:
+                response = {
+                        "status": "error",
+                        "message": "You are not authorized to view this user",
+                        }
+                return Response(response, status=status.HTTP_403_FORBIDDEN)    
+        except User.DoesNotExist:
             response = {
-                "status": "success",
-                "message": "User retrieved successfully",
-                "data": serializer.data
+                "status": "error",
+                "message": "User does not exist",
             }
-            return Response(response, status=status.HTTP_200_OK)
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+    
+    def patch(self, request, id):
+        try:
+            user = User.objects.get(pk=id)
+            if request.user.is_staff:
+                data = request.data
+                serializer = UserUpdateSerializer(user, data=data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    response = {
+                        "status": "success",
+                        "message": "User updated successfully",
+                        "data": serializer.data
+                    }
+                    return Response(response, status=status.HTTP_200_OK)
+            if user == request.user:
+                data = request.data
+                serializer = UserUpdateSerializer(user, data=data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    response = {
+                        "status": "success",
+                        "message": "User updated successfully",
+                        "data": serializer.data
+                    }
+                    return Response(response, status=status.HTTP_200_OK)
+            else:
+                response = {
+                        "status": "error",
+                        "message": "You are not authorized to update this user"
+                        }
+                return Response(response, status=status.HTTP_403_FORBIDDEN)    
         except User.DoesNotExist:
             response = {
                 "status": "error",
@@ -82,9 +140,43 @@ class UserProfileView(APIView):
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
+class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserProfilePictureUpdateView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserProfilePictureSerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class UserAddBankAccountView(APIView):
     permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        operation_summary="Add bank account details",
+        request_body=UserAddBankAccountSerializer,
+        responses={
+            201: "successfully created bank account",
+            400: 'Bad Request'},
+    )
 
     def patch(self, request: Request, id):
        
@@ -101,6 +193,12 @@ class UserAddBankAccountView(APIView):
             
                 }
                 return Response(response, status=status.HTTP_200_OK)
+            bad_response = {
+                "status": "error",
+                "message": "Bad request",
+                "data": serializer.errors,
+            }
+            return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             response = {
                 "status": "error",

@@ -33,4 +33,4 @@ class ListInvitesSerializer(serializers.ModelSerializer):
 class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
-        fields = ["name", "lunch_price", "currency"]
+        fields = '__all__'

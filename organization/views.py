@@ -17,12 +17,20 @@ from users.permissions import IsAdmin
 from rest_framework.permissions import AllowAny
 from . import workers
 from django.core.mail import send_mail
+from drf_yasg.utils import swagger_auto_schema
 
 
 class CreateOrganizationView(APIView):
     permission_classes = [
         IsAdmin
     ]
+
+    @swagger_auto_schema(
+        operation_summary="Create an organization",
+        request_body=OrganizationSerializer,
+        responses={201: 'Organization created successfully',
+                    400: 'Bad Request'}
+    )
 
     def post(self, request):
         
@@ -50,6 +58,13 @@ class CreateOrganizationInviteView(APIView):
         IsAdmin
     ]
 
+    @swagger_auto_schema(
+        operation_summary="Admin send invite to staffs",
+        request_body=OrganizationInviteSerializer,
+        responses={201: 'invitation email sent successfully',
+                    400: 'Bad Request'}
+    )
+
     def post(self, request):
         data = request.data
         org_admin = User.objects.get(pk=request.user.id)
@@ -70,7 +85,7 @@ class CreateOrganizationInviteView(APIView):
             token = invite.token  # Access the token from the saved instance
 
             # Generate the invitation URL
-            invite_url = f"http://127.0.0.1/api/organization/invite/?token={token}"
+            invite_url = f"http://127.0.0.1:8000/api/organization/staff/signup?token={token}"
             message += f'\n\n{invite_url}'
 
             try:
@@ -100,6 +115,13 @@ class CreateStaffFromOrganizationView(APIView):
         IsAdmin
     ]
 
+    @swagger_auto_schema(
+        operation_summary="Organization admin can create staffs from the organization invite",
+        request_body=UserRegistrationSerializer,
+        responses={201: 'Staff created successfully',
+                    400: 'Bad Request'}
+    )
+
     def post(self, request):
         data = request.data
         org_admin = User.objects.get(pk=request.user.id)
@@ -117,6 +139,8 @@ class CreateStaffFromOrganizationView(APIView):
         # Assign org_id and refresh_token to data
         data["org_id"] = org_id.id
         data["refresh_token"] = organization_invite.token
+        lunch_credit_balance = 1000
+        data['lunch_credit_balance'] = lunch_credit_balance
 
         serializer = UserRegistrationSerializer(data=data)
         if serializer.is_valid():
@@ -141,10 +165,22 @@ class StaffConfirmTokenAndSignUpView(APIView):
         AllowAny
     ]
 
+    @swagger_auto_schema(
+        operation_summary="Invited staff can confirm token and sign up",
+        request_body=UserRegistrationSerializer,
+        responses={201: 'Staff created successfully',
+                    400: 'Bad Request'}
+    )
+
     def post(self, request):
         data = request.data
-        refresh_token = data["token"]
+        refresh_token = request.query_params["token"]
         user = User.objects.filter(refresh_token=refresh_token).first()
+        if user:
+            user_first_name = user.first_name
+            data["first_name"] = user_first_name
+
+
         if not user:
             bad_response = {
                 "status": "error",
@@ -178,6 +214,14 @@ class StaffConfirmTokenAndSignUpView(APIView):
     
 class OrganizationLunchWalletView(APIView):
     permission_classes = [IsAdmin]
+
+    @swagger_auto_schema(
+        operation_summary="Create an organization lunch wallet",
+        request_body=OrganizationLunchWalletSerializer,
+        responses={201: 'Organization lunch wallet created successfully',
+                   400: 'Bad Request',
+                   404: 'Organization not found'}
+    )
 
     def post(self, request):
         org_id = request.user.org_id.id
@@ -243,6 +287,13 @@ class OrganizationLunchWalletView(APIView):
 
 class UpdateOrganizationLunchPriceView(APIView):
     permission_classes = [IsAdmin]
+
+    @swagger_auto_schema(
+        operation_summary="Organization admin can update the lunch price",
+        request_body=OrganizationSerializer,
+        responses={201: 'Organization lunch price updated successfully',
+                    400: 'Bad Request'}
+    )
 
     def patch(self, request):
         org_id = request.user.org_id.id
