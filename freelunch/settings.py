@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -62,7 +63,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+
 ]
 
 ROOT_URLCONF = "freelunch.urls"
@@ -216,25 +217,30 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = os.path.join(BASE_DIR, "static/")
+# STATIC_URL = os.path.join(BASE_DIR, "static/")
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles/")
+# STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles/")
 
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
-# cloudinary config for profile picture upload
-# cloudinary.config(
-#     cloud_name = config('CLOUDINARY_CLOUD_NAME'),
-#     api_key = config('CLOUDINARY_API_KEY'),
-#     api_secret = config('CLOUDINARY_API_SECRET')
-# )
-
+#cloudinary config for profile picture upload
 cloudinary.config(
-    cloud_name=os.environ['CLOUDINARY_CLOUD_NAME'],
-    api_key=os.environ['CLOUDINARY_API_KEY'],
-    api_secret=os.environ['CLOUDINARY_API_SECRET']
+    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
+    api_key = config('CLOUDINARY_API_KEY'),
+    api_secret = config('CLOUDINARY_API_SECRET')
 )
+
+# cloudinary.config(
+#     cloud_name=os.environ['CLOUDINARY_CLOUD_NAME'],
+#     api_key=os.environ['CLOUDINARY_API_KEY'],
+#     api_secret=os.environ['CLOUDINARY_API_SECRET']
+# )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
