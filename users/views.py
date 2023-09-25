@@ -276,11 +276,6 @@ class RedeemLunchView(APIView):
             # Get the list of user IDs from the serializer
             user_ids = serializer.validated_data.get('ids')
 
-            # Assuming you have a function to handle lunch credit redemption in your User model
-            for user_id in user_ids:
-                user = User.objects.get(pk=user_id)
-                user.redeem_lunch_credit()  # Implement this method in your User model
-
             return Response(
                 {
                     "message": "success",
