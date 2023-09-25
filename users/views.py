@@ -205,7 +205,7 @@ class SearchUserView(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
-class UserUpdateView(generics.RetrieveUpdateAPIView):
+class UserUpdateView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserUpdateSerializer
     permission_classes = [IsAuthenticated]
