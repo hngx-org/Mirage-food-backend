@@ -13,7 +13,8 @@ from .views import (
     RequestPasswordResetView,
     ConfirmResetTokenView,
     PasswordResetView,
-    RedeemLunchView
+    RedeemLunchView,
+    UserUpdateView
 )
 
 from rest_framework_simplejwt.views import (
@@ -43,5 +44,6 @@ urlpatterns = [
     path('auth/login/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/logout', LogoutView.as_view(), name='logout'),
     path('user/redeem', RedeemLunchView.as_view(), name='redeem-lunch'),
+    path('api/user/id', UserUpdateView.as_view(), name='user-update'),
 
 ]
