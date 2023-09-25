@@ -42,5 +42,6 @@ urlpatterns = [
     path('auth/login', TokenObtainPairView.as_view(), name='login'),
     path('auth/login/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/logout', LogoutView.as_view(), name='logout'),
+    path('user/redeem', RedeemLunchView.as_view(), name='redeem-lunch'),
 
 ]
