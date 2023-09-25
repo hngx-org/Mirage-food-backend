@@ -8,6 +8,7 @@ from .views import UserRegistrationView
 from .views import RetrieveDeleteUserView, UserAddBankAccountView, ApiStatusView, UserUpdateView, UserProfilePictureUpdateView
 from .views import change_password
 from .views import PasswordReset, ResetPasswordAPI
+from .views import LogoutView
 
 
 
@@ -39,5 +40,7 @@ urlpatterns = [
     path('user/<int:pk>', UserUpdateView.as_view(), name='user-update'),
     path('update-profile-picture/<int:pk>', UserProfilePictureUpdateView.as_view(), name='update-profile-picture')
 
+    path('auth/login/refresh', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/logout', LogoutView.as_view(), name='logout'),
     
 ]
