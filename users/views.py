@@ -7,6 +7,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate, login
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.generics import RetrieveUpdateAPIView
 
 
 from .models import User
@@ -16,6 +17,7 @@ from .serializers import (
     SearchedUserSerializer,
     UserDetailsSerializer,
     RedeemLunchSerializer,
+    UserUpdateSerializer,
 
 )
 from . import workers
@@ -294,3 +296,12 @@ class RedeemLunchView(APIView):
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class UserUpdateView(RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
