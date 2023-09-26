@@ -251,14 +251,14 @@ class UserDetailView(APIView):
         """
         user = request.user
         user_details = workers.UserWorker.get_user_details(user.id)
+        print(user_details)
         serializer = UserDetailsSerializer(user_details)
         return Response(
             {
                 "message": "User data fetched",
                 "statusCode": status.HTTP_200_OK,
-                "data": serializer.data,
+                "data":user_details,
             },
-            status=status.HTTP_200_OK,
-            message="User data fetched",
+            status=status.HTTP_200_OK
         )
 
