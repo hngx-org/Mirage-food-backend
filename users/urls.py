@@ -21,6 +21,7 @@ from rest_framework_simplejwt.views import (
 
 
 urlpatterns = [
+    path('user', UserDetailView.as_view(),name="get_user"),
     path('users/all', UserListViewSet.as_view(), name='users-list'),
     path('users/<int:id>', DeleteUserView.as_view()),
     path('users/<int:user_id>/lunches/<int:lunch_id>',LunchDetailView.as_view(),name='lunch-detail'),
