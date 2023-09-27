@@ -16,7 +16,6 @@ class LunchWithdrawalCreateView(APIView):
         request_body=WithdrawalRequestSerializer,
         responses={201: 'Created', 400: 'Bad Request'},
     )
-
     def post(self, request, *args, **kwargs):
         data = request.data
         bank_name = data.get("bank_name")
@@ -36,14 +35,17 @@ class LunchWithdrawalCreateView(APIView):
                 error_response = {
                     "message": "Your lunch credit balance is below your withdrawal amount"
                 }
-                return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
-            
+                return Response(error_response, status=status.HTTP_400_BAD_REQUEST) 
             if user.bank_name != bank_name or user.bank_number != bank_number:
                 response = {
                     "message": "User bank account or bank name not correct"
                 }
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
+            if int(withdrawal.amount) < 100:
+                response = {
+                    "message": "Withdrawal amount must be greater than 100"
+                }
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
             withdrawal.status = "redeemed"
             withdrawal.save()
             user.lunch_credit_balance = float(user.lunch_credit_balance) - float(withdrawal.amount)
