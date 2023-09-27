@@ -29,7 +29,9 @@ class LunchWithdrawalCreateView(APIView):
                 amount=serializer.validated_data["amount"],
                 user_id=user
             )
-            
+            user = User.objects.get(id=user.id)
+            if user.lunch_credit_balance != '0':
+                user.lunch_credit_balance = 0
             if int(user.lunch_credit_balance) < int(withdrawal.amount):
                 error_response = {
                     "message": "Your lunch credit balance is below your withdrawal amount"
