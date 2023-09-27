@@ -43,8 +43,6 @@ class UserRegistrationView(APIView):
 
     def post(self, request):
         data = request.data
-        lunch_credit_balance = 1000
-        data['lunch_credit_balance'] = lunch_credit_balance
 
         serializer = UserRegistrationSerializer(data=data)
         if serializer.is_valid():
