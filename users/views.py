@@ -43,8 +43,6 @@ class UserRegistrationView(APIView):
 
     def post(self, request):
         data = request.data
-        lunch_credit_balance = 1000
-        data['lunch_credit_balance'] = lunch_credit_balance
 
         serializer = UserRegistrationSerializer(data=data)
         if serializer.is_valid():
@@ -66,7 +64,7 @@ class UserRegistrationView(APIView):
 
 class UserLoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
-       
+
     @swagger_auto_schema(
         operation_summary="Login a user",
         responses={
@@ -91,29 +89,6 @@ class UserLoginView(TokenObtainPairView):
             except User.DoesNotExist:
                 response.data["data"] = {}
         return response
-
-
-
-
-class DeleteUserView(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def delete(self, request, pk):
-
-        try:
-            user = User.objects.get(pk=id)
-            user.delete()
-            response = {
-                "status": "success",
-                "message": "User deleted successfully",
-            }
-            return Response(response, status=status.HTTP_204_NO_CONTENT)
-        except User.DoesNotExist:
-            error_response = {
-                "status": "error",
-                "message": "User does not exist",
-            }
-            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
 
 
 class UserProfileView(APIView):
@@ -190,8 +165,30 @@ class UserProfileView(APIView):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
 
+class DeleteUserView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def delete(self, request, pk):
+
+        try:
+            user = User.objects.get(pk=id)
+            user.delete()
+            response = {
+                "status": "success",
+                "message": "User deleted successfully",
+            }
+            return Response(response, status=status.HTTP_204_NO_CONTENT)
+        except User.DoesNotExist:
+            error_response = {
+                "status": "error",
+                "message": "User does not exist",
+            }
+            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
+
+
 class UserAddBankAccountView(APIView):
     permission_classes = [IsAuthenticated]
+    
     @swagger_auto_schema(
         operation_summary="Add bank account details",
         request_body=UserAddBankAccountSerializer,
