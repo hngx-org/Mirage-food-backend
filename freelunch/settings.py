@@ -82,6 +82,7 @@ WSGI_APPLICATION = "freelunch.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -90,10 +91,9 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST':  config('DB_HOST'),
         'PORT': config('DB_PORT')
+
     }
 }
-
-
 
 
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -160,12 +160,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-# STATIC_URL = os.path.join(BASE_DIR, "static/")
-
-# STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles/")
-
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -215,7 +209,7 @@ SWAGGER_SETTINGS = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=4),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
@@ -226,5 +220,3 @@ EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-
-

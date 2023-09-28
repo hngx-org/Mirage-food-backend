@@ -12,7 +12,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,)
 from .views import change_password
 from .views import PasswordReset, ResetPasswordAPI
-
+from .views import LogoutView
 
 
 
@@ -35,5 +35,6 @@ urlpatterns = [
         ResetPasswordAPI.as_view(),
         name="reset-password",
     ),
+    path('auth/logout', LogoutView.as_view(), name='logout'),
 
 ]

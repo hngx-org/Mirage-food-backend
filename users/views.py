@@ -26,7 +26,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.core.mail import send_mail
 from . import serializers
 from django.http import Http404
-from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
+from rest_framework_simplejwt.views import (TokenObtainPairView)
+from django.contrib.auth import logout
 
 
 class ApiStatusView(APIView):
@@ -35,6 +36,14 @@ class ApiStatusView(APIView):
     def get(self, request):
         return Response("API is Live", status=status.HTTP_200_OK)
     
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Logout the user and invalidate the token
+        logout(request)
+        return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
+
 
 class UserRegistrationView(APIView):
     permission_classes = [
@@ -291,7 +300,9 @@ class PasswordReset(generics.GenericAPIView):
                 "reset-password",
                 kwargs={"encoded_pk": encoded_pk, "token": token},
             )
+
             reset_link = f"https://mirage-backend.onrender.com{reset_url}"
+
 
             # Send the reset link as an email to the user
             subject = "Password Reset Link"
