@@ -40,48 +40,6 @@ class LogoutView(APIView):
         return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
 
 
-# Create your views here.
-# class LoginView(APIView):
-#     def post(self, request, *args, **kwargs):
-#     # Get username and password from the request
-#         email = request.data.get('email')
-#         password = request.data.get('password')
-
-#         # Authenticate the user
-#         user = authenticate(request, email=email, password=password)
-
-#         if user is not None:
-#             # If authentication is successful, create or retrieve a token
-#             token, created = Token.objects.get_or_create(user=user)
-#             login(request, user)  # Optional: Log the user in
-#             response_data = {
-#                 "message": "User authenticated successfully",
-#                 "statusCode": status.HTTP_200_OK,
-#                 "access_token": token.key,
-#                 "email": user.email,
-#                 "id": user.id,
-#                 "isAdmin": user.is_staff  # Assuming 'is_staff' signifies admin status
-#                 }
- 
-#             return Response(response_data, status=status.HTTP_200_OK)
-#         else:
-#             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
-
-# class DeleteUserView(APIView):
-
-#     def get_user_by_pk(self, pk):
-#         try:
-#             return User.objects.get(pk=id)
-#         except:
-#             return Response({
-#                 'error': 'User does not exist.'
-#             }, status=status.HTTP_404_NOT_FOUND)
-
-#     def delete_user(self, request, pk):
-#         user = self.get_user_by_pk(pk=id)
-#         user.delete()
-#         return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 class DeleteUserView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -345,22 +303,11 @@ class PasswordReset(generics.GenericAPIView):
             )
             reset_link = f"https://mirage-backend.onrender.com/api/{reset_url}"
 
-            #  # Send email to the invitee
-            # subject = 'Invitation to join Mirage Free Lunch App'
-            # message = 'This is your invitation token.'
-            # from_email = 'abiolaadedayo1993@gmail.com'
-            # recipient_list = [invite.email]
-            # token = invite.token  # Access the token from the saved instance
-
-            # # Generate the invitation URL
-            # invite_url = f"https://mirage-backend.onrender.com/api/organization/staff/signup?token={token}"
-            # message += f'\n\n{invite_url}'
-
 
             # Send the reset link as an email to the user
             subject = "Password Reset Link"
             message = f"Click the following link to reset your password: {reset_link}"
-            from_email = "mwiksdev@gmail.com"  # Change to your email
+            from_email = 'abiolaadedayo1993@gmail.com'  # Change to your email
             recipient_list = [email]
 
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)

@@ -41,6 +41,11 @@ class LunchWithdrawalCreateView(APIView):
                     "message": "User bank account or bank name not correct"
                 }
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            if int(withdrawal.amount) < 100:
+                response = {
+                    "message": "Withdrawal amount must be greater than 100"
+                }
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
             withdrawal.status = "redeemed"
             withdrawal.save()
@@ -65,3 +70,4 @@ class LunchWithdrawalCreateView(APIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    

@@ -23,19 +23,28 @@ class CreateOrganizationFreeLunchApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
+        user = request.user
         receiver_id = data.get('receiver_id')
         quantity = data.get('quantity')
         note = data.get('note')
+        if quantity is None:
+            quantity = 1
+        if user.org_id is None:
+            return Response(
+                {"error": "Only user with an organization can send a lunch"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         data['sender_id'] = request.user.id
         data['org_id'] = request.user.org_id.id
 
-        organization = Organization.objects.filter(id=request.user.org_id.id).first()
+
+        organization = Organization.objects.filter(id=user.org_id_id).first()
     
         organization_lunch_price = organization.lunch_price
-        organization_wallet = OrganizationLunchWallet.objects.filter(org_id=organization).first()
+        organization_wallet = OrganizationLunchWallet.objects.filter(org_id=organization.id).first()
         organization_wallet_balance = organization_wallet.balance
 
-        if receiver_id == request.user.id:
+        if receiver_id == user.id:
             return Response(
                 {"error": "You can't send lunch to yourself"},
                 status=status.HTTP_400_BAD_REQUEST
@@ -131,7 +140,7 @@ class CreateFreeLunchAPIView(APIView):
                 organization = Organization.objects.filter(id=org_id_id).first()
                 organization_lunch_price = organization.lunch_price
                 
-                user.lunch_credit_balance = int(user.lunch_credit_balance) - (int(quantity)*organization_lunch_price)
+                user.lunch_credit_balance = int(user.lunch_credit_balance) - (int(quantity) * organization_lunch_price)
                 user.lunch_credit_balance = int(user.lunch_credit_balance)
                 user.save()
                 serializer.save()

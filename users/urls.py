@@ -25,13 +25,13 @@ urlpatterns = [
     path('auth/user/signup', UserRegistrationView.as_view(), name='user-signup'),
     path('auth/login', UserLoginView.as_view(), name='user-login'),  
     path('status', ApiStatusView.as_view(), name='ApiStatus'),
-    path('change_password/', change_password, name='change_password'),
+    path('user/change_password/', change_password, name='change_password'),
     path(
         "user/reset_password",
         PasswordReset.as_view(),
         name="request-password-reset",),
     path(
-        "user/password-reset/<str:encoded_pk>/<str:token>/",
+        "user/password-reset/<str:encoded_pk>/<str:token>",
         ResetPasswordAPI.as_view(),
         name="reset-password",
     ),
