@@ -18,47 +18,54 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import update_session_auth_hash
 from rest_framework.decorators import api_view, permission_classes
-
 from rest_framework import generics, status, viewsets, response
-
-
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.core.mail import send_mail
-
 from . import serializers
-
 from django.http import Http404
-from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
+from rest_framework_simplejwt.views import (TokenObtainPairView)
+
+
+from django.contrib.auth import logout
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Logout the user and invalidate the token
+        logout(request)
+        return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
+
 
 # Create your views here.
-class LoginView(APIView):
-    def post(self, request, *args, **kwargs):
-    # Get username and password from the request
-        email = request.data.get('email')
-        password = request.data.get('password')
+# class LoginView(APIView):
+#     def post(self, request, *args, **kwargs):
+#     # Get username and password from the request
+#         email = request.data.get('email')
+#         password = request.data.get('password')
 
-        # Authenticate the user
-        user = authenticate(request, email=email, password=password)
+#         # Authenticate the user
+#         user = authenticate(request, email=email, password=password)
 
-        if user is not None:
-            # If authentication is successful, create or retrieve a token
-            token, created = Token.objects.get_or_create(user=user)
-            login(request, user)  # Optional: Log the user in
-            response_data = {
-                "message": "User authenticated successfully",
-                "statusCode": status.HTTP_200_OK,
-                "access_token": token.key,
-                "email": user.email,
-                "id": user.id,
-                "isAdmin": user.is_staff  # Assuming 'is_staff' signifies admin status
-                }
+#         if user is not None:
+#             # If authentication is successful, create or retrieve a token
+#             token, created = Token.objects.get_or_create(user=user)
+#             login(request, user)  # Optional: Log the user in
+#             response_data = {
+#                 "message": "User authenticated successfully",
+#                 "statusCode": status.HTTP_200_OK,
+#                 "access_token": token.key,
+#                 "email": user.email,
+#                 "id": user.id,
+#                 "isAdmin": user.is_staff  # Assuming 'is_staff' signifies admin status
+#                 }
  
-            return Response(response_data, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+#             return Response(response_data, status=status.HTTP_200_OK)
+#         else:
+#             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # class DeleteUserView(APIView):
@@ -412,6 +419,9 @@ class ApiStatusView(APIView):
 
     def  get(self, request):
         return Response("API is Live", status=status.HTTP_200_OK)
+    
+
+    
     
 class UserLoginView(TokenObtainPairView):
     permission_classes = [AllowAny]

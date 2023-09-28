@@ -101,6 +101,12 @@ DATABASES = {
     }
 }
 
+# host: 35.193.20.212
+# port: 3306
+# user: mirage
+# password: ~9c7^=Xk1(cA
+# db: free_lunch_db
+
 
 # DATABASES = {
 #     'default': {
