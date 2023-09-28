@@ -8,20 +8,21 @@ from .serializers import WithdrawalRequestSerializer
 from drf_yasg.utils import swagger_auto_schema
 
 
-
 class LunchWithdrawalCreateView(APIView):
     permission_classes = [IsAuthenticated]
+    
     @swagger_auto_schema(
         operation_summary="Request a withdrawal",
         request_body=WithdrawalRequestSerializer,
-        responses={201: 'Created', 400: 'Bad Request'},
+        responses={201: 'Created',
+                   400: 'Bad Request'},
     )
     def post(self, request, *args, **kwargs):
         data = request.data
         bank_name = data.get("bank_name")
         bank_number = data.get("bank_number")
-        serializer = WithdrawalRequestSerializer(data=data)
-        
+
+        serializer = WithdrawalRequestSerializer(data=data) 
         if serializer.is_valid(raise_exception=True):
             user = request.user
             withdrawal = Withdrawal.objects.create(
@@ -29,10 +30,14 @@ class LunchWithdrawalCreateView(APIView):
                 user_id=user
             )
             user = User.objects.get(id=user.id)
-            if user.lunch_credit_balance != '0':
+
+            if user.lunch_credit_balance == '':
                 user.lunch_credit_balance = 0
+                user.save()
+                
             if int(user.lunch_credit_balance) < int(withdrawal.amount):
                 error_response = {
+                    "status": "error",
                     "message": "Your lunch credit balance is below your withdrawal amount"
                 }
                 return Response(error_response, status=status.HTTP_400_BAD_REQUEST) 
