@@ -8,39 +8,46 @@ from .serializers import WithdrawalRequestSerializer
 from drf_yasg.utils import swagger_auto_schema
 
 
-
 class LunchWithdrawalCreateView(APIView):
     permission_classes = [IsAuthenticated]
+    
     @swagger_auto_schema(
         operation_summary="Request a withdrawal",
         request_body=WithdrawalRequestSerializer,
-        responses={201: 'Created', 400: 'Bad Request'},
+        responses={201: 'Created',
+                   400: 'Bad Request'},
     )
-
     def post(self, request, *args, **kwargs):
         data = request.data
         bank_name = data.get("bank_name")
         bank_number = data.get("bank_number")
-        serializer = WithdrawalRequestSerializer(data=data)
-        
+
+        serializer = WithdrawalRequestSerializer(data=data) 
         if serializer.is_valid(raise_exception=True):
             user = request.user
             withdrawal = Withdrawal.objects.create(
                 amount=serializer.validated_data["amount"],
                 user_id=user
             )
-            
+            user = User.objects.get(id=user.id)
+
+            if user.lunch_credit_balance == '':
+                user.lunch_credit_balance = 0
+                user.save()
+                
             if int(user.lunch_credit_balance) < int(withdrawal.amount):
                 error_response = {
+                    "status": "error",
                     "message": "Your lunch credit balance is below your withdrawal amount"
                 }
-                return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
-            
+                return Response(error_response, status=status.HTTP_400_BAD_REQUEST) 
             if user.bank_name != bank_name or user.bank_number != bank_number:
                 response = {
+                    "status": "error"
                     "message": "User bank account or bank name not correct"
                 }
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
+              
             if int(withdrawal.amount) < 100:
                 response = {
                     "message": "Withdrawal amount must be greater than 100"
@@ -70,4 +77,3 @@ class LunchWithdrawalCreateView(APIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    

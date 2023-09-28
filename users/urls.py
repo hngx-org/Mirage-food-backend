@@ -25,7 +25,7 @@ urlpatterns = [
     path('auth/user/signup', UserRegistrationView.as_view(), name='user-signup'),
     path('auth/login', UserLoginView.as_view(), name='user-login'),  
     path('status', ApiStatusView.as_view(), name='ApiStatus'),
-    path('user/change_password/', change_password, name='change_password'),
+    path('user/change_password', change_password, name='change_password'),
     path(
         "user/reset_password",
         PasswordReset.as_view(),

@@ -27,10 +27,15 @@ from django.core.mail import send_mail
 from . import serializers
 from django.http import Http404
 from rest_framework_simplejwt.views import (TokenObtainPairView)
-
-
 from django.contrib.auth import logout
 
+
+class ApiStatusView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        return Response("API is Live", status=status.HTTP_200_OK)
+    
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -40,26 +45,59 @@ class LogoutView(APIView):
         return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
 
 
+class UserRegistrationView(APIView):
+    permission_classes = [
+        AllowAny
+    ]
 
-class DeleteUserView(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    def post(self, request):
+        data = request.data
 
-    def delete(self, request, pk):
-
-        try:
-            user = User.objects.get(pk=id)
-            user.delete()
+        serializer = UserRegistrationSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
             response = {
                 "status": "success",
-                "message": "User deleted successfully",
+                "message": "User created successfully",
+                "data": serializer.data,
             }
-            return Response(response, status=status.HTTP_204_NO_CONTENT)
-        except User.DoesNotExist:
-            error_response = {
-                "status": "error",
-                "message": "User does not exist",
-            }
-            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
+            return Response(response, status=status.HTTP_201_CREATED)
+
+        bad_response = {
+            "status": "error",
+            "message": "Bad request",
+            "data": serializer.errors,
+        }
+        return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserLoginView(TokenObtainPairView):
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_summary="Login a user",
+        responses={
+            200: "successfully logged in",
+            400: 'Bad Request'},
+    )
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            try:
+                user = User.objects.get(email=request.data.get('email'))
+                user_profile_data = {
+                    "id": user.id if user.id is not None else 0,
+                    "first_name": user.first_name if user.first_name else "",
+                    "last_name": user.last_name if user.last_name else "",
+                    "email": user.email if user.email else "",
+                    "phone": user.phone if user.phone else "",
+                    "organization_id": user.org_id.id if user.org_id else "",
+                    "lunch_credit_balance": user.lunch_credit_balance if user.lunch_credit_balance is not None else 0,
+                    }
+                response.data["data"] = user_profile_data
+            except User.DoesNotExist:
+                response.data["data"] = {}
+        return response
 
 
 class UserProfileView(APIView):
@@ -136,9 +174,30 @@ class UserProfileView(APIView):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
 
+class DeleteUserView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def delete(self, request, pk):
+
+        try:
+            user = User.objects.get(pk=id)
+            user.delete()
+            response = {
+                "status": "success",
+                "message": "User deleted successfully",
+            }
+            return Response(response, status=status.HTTP_204_NO_CONTENT)
+        except User.DoesNotExist:
+            error_response = {
+                "status": "error",
+                "message": "User does not exist",
+            }
+            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
+
 
 class UserAddBankAccountView(APIView):
     permission_classes = [IsAuthenticated]
+    
     @swagger_auto_schema(
         operation_summary="Add bank account details",
         request_body=UserAddBankAccountSerializer,
@@ -146,7 +205,6 @@ class UserAddBankAccountView(APIView):
             201: "successfully created bank account",
             400: 'Bad Request'},
     )
-
     def patch(self, request: Request, id):
        
         try:
@@ -175,64 +233,7 @@ class UserAddBankAccountView(APIView):
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-
-
-
-
-        
-    # def get_user_by_pk(self, pk):
-    #     try:
-    #         return User.objects.get(pk=id)
-    #     except:
-    #         return Response({
-    #             'error': 'User does not exist.'
-    #         }, status=status.HTTP_404_NOT_FOUND)
-
-    # def delete_user(self, request, pk):
-    #     user = self.get_user_by_pk(pk=id)
-    #     user.delete()
-    #     return Response({'Message': 'User Deleted'}, status=status.HTTP_204_NO_CONTENT)
-
-
-# class UserRegistrationView(generics.CreateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserRegistrationSerializer
-#     permission_classes = [AllowAny]
-
-
-class UserRegistrationView(APIView):
-    permission_classes = [
-        AllowAny
-    ]
-
-    def post(self, request):
-        data = request.data
-        lunch_credit_balance = 1000
-        data['lunch_credit_balance'] = lunch_credit_balance
-
-        serializer = UserRegistrationSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            response = {
-                "status": "success",
-                "message": "User created successfully",
-                "data": serializer.data,
-            }
-            return Response(response, status=status.HTTP_201_CREATED)
-
-        bad_response = {
-            "status": "error",
-            "message": "Bad request",
-            "data": serializer.errors,
-        }
-        return Response(bad_response, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
+       
 class UserListViewSet(APIView):
     permission_classes = [IsAdminUser]
 
@@ -276,8 +277,6 @@ class SearchUserView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-
-
 class PasswordReset(generics.GenericAPIView):
     permission_classes = [AllowAny]
     """
@@ -301,7 +300,8 @@ class PasswordReset(generics.GenericAPIView):
                 "reset-password",
                 kwargs={"encoded_pk": encoded_pk, "token": token},
             )
-            reset_link = f"https://mirage-backend.onrender.com/api/{reset_url}"
+
+            reset_link = f"https://mirage-backend.onrender.com{reset_url}"
 
 
             # Send the reset link as an email to the user
@@ -359,38 +359,3 @@ def change_password(request):
                 return Response({'message': 'Password changed successfully.'}, status=status.HTTP_200_OK)
             return Response({'error': 'Incorrect old password.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ApiStatusView(APIView):
-    permission_classes = [ AllowAny]
-
-    def  get(self, request):
-        return Response("API is Live", status=status.HTTP_200_OK)
-    
-
-    
-    
-class UserLoginView(TokenObtainPairView):
-    permission_classes = [AllowAny]
-    @swagger_auto_schema(
-        operation_summary="Login a user",
-        responses={
-            200: "successfully logged in",
-            400: 'Bad Request'},
-    )
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        if response.status_code == 200:
-                user = User.objects.get(email=request.data['email'])
-                user_profile_data = {
-                    "id": user.id,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "email": user.email,
-                    "phone": user.phone,
-                    "organization_id": user.org_id.id,
-                    "lunch_credit_balance": user.lunch_credit_balance,
-                }
-                response.data["data"] = user_profile_data
-        return response
-
